@@ -139,6 +139,13 @@
     .history-exercise{margin-top:9px;font-size:.9rem}
     .history-exercise strong{display:block}
     .session-status{margin-top:10px;font-weight:800;color:var(--sage)}#selectedWorkoutTitle{scroll-margin-top:110px}
+
+    .today-workout-card{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    .today-workout-card-top{display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .today-workout-card h3{margin:4px 0 6px}
+    .today-workout-label{font-size:.76rem;font-weight:800;letter-spacing:.08em}
+    .today-workout-arrow{font-size:2rem;line-height:1;color:var(--taupe-dark)}
+    #openTodayWorkout{margin-top:14px;width:100%}
 @media(max-width:850px){
       .hero{grid-template-columns:1fr}
       .card,.card.wide{grid-column:1/-1}
@@ -211,13 +218,19 @@
     <section class="panel active" id="today">
       <div class="grid">
 
-        <div class="card wide" id="todayWorkoutCard">
-          <h3 id="todayWorkoutTitle">Today’s training</h3>
-          <p class="muted" id="todayWorkoutSubtitle"></p>
-          <div id="todayWorkoutExercises"></div>
-          <button class="btn" id="completeTodayWorkout" style="margin-top:12px">Mark workout complete</button>
+        
+        <div class="card wide today-workout-card" id="todayWorkoutCard" role="button" tabindex="0">
+          <div class="today-workout-card-top">
+            <div>
+              <div class="muted today-workout-label">TODAY’S WORKOUT</div>
+              <h3 id="todayWorkoutTitle">Today’s training</h3>
+              <p class="muted" id="todayWorkoutSubtitle"></p>
+            </div>
+            <span class="today-workout-arrow">›</span>
+          </div>
+          <button class="btn" id="openTodayWorkout">Open workout</button>
         </div>
-        <div class="card wide">
+<div class="card wide">
           <h3>Today’s checklist</h3>
           <div id="dailyTasks"></div>
         </div>
@@ -764,27 +777,41 @@ function renderWorkoutHistory(day=selectedTrainingDay){
 function renderTodayWorkout(){
   const calendarDay=new Date().toLocaleDateString("en-GB",{weekday:"long"});
   const assigned=workoutsForCalendarDay(calendarDay);
-  const day=assigned[0]||calendarDay;
-  const p=trainingPlan[day];
-  if(!p)return;
+  const workoutDay=assigned[0]||calendarDay;
+  const plan=trainingPlan[workoutDay];
+  if(!plan)return;
 
-  const movedText=day!==calendarDay?` · moved from ${day}`:"";
-  document.getElementById("todayWorkoutTitle").textContent=calendarDay+" — "+p.title;
-  document.getElementById("todayWorkoutSubtitle").textContent=p.subtitle+movedText;
-  workoutRows(day,"todayWorkoutExercises",false);
+  const movedText=workoutDay!==calendarDay?`Moved from ${workoutDay} · `:"";
+  document.getElementById("todayWorkoutTitle").textContent=plan.title;
+  document.getElementById("todayWorkoutSubtitle").textContent=movedText+plan.subtitle;
 
-  const btn=document.getElementById("completeTodayWorkout");
-  const refresh=()=>{
-    const done=localStorage.getItem(trainingKey(day))==="1";
-    btn.textContent=done?"✓ Workout completed":"Mark workout complete";
-    btn.classList.toggle("secondary",done);
+  const openToday=()=>{
+    showWorkout(workoutDay);
+    const trainingTab=document.querySelector('[data-tab="training"]');
+    if(trainingTab)trainingTab.click();
+    setTimeout(()=>{
+      const target=document.getElementById("selectedWorkoutTitle");
+      if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
+    },80);
   };
-  btn.onclick=()=>{
-    localStorage.setItem(trainingKey(day),localStorage.getItem(trainingKey(day))==="1"?"0":"1");
-    refresh();
-    renderTrainingWeek();
+
+  const card=document.getElementById("todayWorkoutCard");
+  const button=document.getElementById("openTodayWorkout");
+
+  card.onclick=e=>{
+    if(e.target===button)return;
+    openToday();
   };
-  refresh();
+  card.onkeydown=e=>{
+    if(e.key==="Enter"||e.key===" "){
+      e.preventDefault();
+      openToday();
+    }
+  };
+  button.onclick=e=>{
+    e.stopPropagation();
+    openToday();
+  };
 }
 function renderStairs(){
  const wrap=document.getElementById("stairIntervals"); if(!wrap)return;
