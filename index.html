@@ -503,7 +503,11 @@
     Sunday:["No business work","Rest and reset","Prepare gently for Monday"]
   };
 
-  function dailyKey(name){ return `ceohq-${now.toISOString().slice(0,10)}-${name}`; }
+  function currentDateKey(){
+    const d=new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  }
+  function dailyKey(name){ return `ceohq-${currentDateKey()}-${name}`; }
 
   const tasksEl = document.getElementById("dailyTasks");
   weekdayTasks[day].forEach((text,i)=>{
@@ -523,6 +527,26 @@
       btn.classList.add("active"); document.getElementById(btn.dataset.tab).classList.add("active");
     });
   });
+
+  const dailyResetFields=["priority1","priority2","priority3","water","mood","reading","dailyWin"];
+
+  function clearDailySavedData(){
+    dailyResetFields.forEach(name=>localStorage.removeItem("ceohq-"+name));
+  }
+
+  function checkForNewDay(){
+    const today=currentDateKey();
+    const lastDate=localStorage.getItem("ceohq-last-active-date");
+
+    if(lastDate && lastDate!==today){
+      clearDailySavedData();
+    }
+
+    localStorage.setItem("ceohq-last-active-date",today);
+    return lastDate && lastDate!==today;
+  }
+
+  const openedOnNewDay=checkForNewDay();
 
   document.querySelectorAll("[data-save]").forEach(el=>{
     const key="ceohq-"+el.dataset.save;
@@ -614,8 +638,8 @@
       localStorage.removeItem(priorityCheckKey(cb.dataset.priorityCheck));
     });
 
-    ["priority1","priority2","priority3","water","mood","reading","dailyWin"].forEach(name=>{
-      localStorage.removeItem("ceohq-"+name);
+    clearDailySavedData();
+    dailyResetFields.forEach(name=>{
       const el=document.querySelector(`[data-save="${name}"]`);
       if(el)el.value="";
     });
@@ -633,6 +657,20 @@
   if(waterFocusInput)waterFocusInput.addEventListener("input",updateTodayFocus);
   updatePriorityProgress();
   updateTodayFocus();
+
+  let activeDateKey=currentDateKey();
+  setInterval(()=>{
+    const newDateKey=currentDateKey();
+    if(newDateKey!==activeDateKey){
+      clearDailySavedData();
+      localStorage.setItem("ceohq-last-active-date",newDateKey);
+      window.location.reload();
+    }
+  },60000);
+
+  if(openedOnNewDay){
+    setTimeout(()=>toast("A fresh day is ready ✨"),350);
+  }
 
 const sectionFields={priorities:["priority1","priority2","priority3"],notes:["quickNotes"],wellbeing:["water","mood","reading"],dailywin:["dailyWin"],travel:["travelTasks"],uw:["uwTasks"],app:["appTasks"],jg:["jgTasks"],gratitude:["gratitude"],weeklyreflection:["weeklyProud","weeklyWorked","weeklyImprove"],weeklynumbers:["travelIncome","uwIncome","jgIncome","workoutsDone"]};
 function getWeekStart(date){const d=new Date(date);const n=d.getDay();d.setDate(d.getDate()-n+(n===0?-6:1));d.setHours(0,0,0,0);return d}
