@@ -128,9 +128,9 @@
 
     .exercise-history{margin-top:10px;padding:10px 12px;background:#faf7f3;border-radius:12px;font-size:.88rem;color:var(--muted)}
     .exercise-history strong{color:var(--taupe-dark)}
-    .set-grid{display:grid;grid-template-columns:48px 1fr 1fr;gap:8px;align-items:center;margin-top:10px}
+    .set-grid{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center;margin-top:10px;width:100%;max-width:100%}
     .set-grid .set-label{font-size:.84rem;font-weight:800;color:var(--muted)}
-    .set-grid input{margin-top:0;text-align:center}.last-set-line{grid-column:2/4;font-size:.78rem;color:var(--muted);margin-top:-3px;padding-left:2px}.last-set-line strong{color:var(--taupe-dark)}.set-column-labels{display:grid;grid-template-columns:48px 1fr 1fr;gap:8px;margin-top:10px;font-size:.76rem;font-weight:800;color:var(--muted);text-align:center}.set-column-labels span:first-child{text-align:left}
+    .set-grid input{margin-top:0;text-align:center;width:100%;min-width:0;max-width:100%;padding:10px 8px;font-size:.92rem}.last-set-line{grid-column:2/4;font-size:.78rem;color:var(--muted);margin-top:-3px;padding-left:2px}.last-set-line strong{color:var(--taupe-dark)}.set-column-labels{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:10px;font-size:.76rem;font-weight:800;color:var(--muted);text-align:center;width:100%;max-width:100%}.set-column-labels span:first-child{text-align:left}
     .progression-tip{margin-top:8px;padding:9px 11px;border-radius:11px;background:#f2eee9;font-size:.85rem;line-height:1.4}
     .session-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .history-session{padding:14px 0;border-bottom:1px dashed var(--line)}
@@ -147,7 +147,32 @@
       .business-grid{grid-template-columns:1fr}
       header{align-items:flex-start}
     }
-  </style>
+  
+    @media(max-width:560px){
+      .set-grid,.set-column-labels{
+        grid-template-columns:38px minmax(0,1fr) minmax(0,1fr);
+        gap:6px;
+      }
+      .set-grid input{
+        padding:9px 6px;
+        font-size:.85rem;
+        border-radius:10px;
+      }
+      .set-grid .set-label{
+        font-size:.76rem;
+      }
+      .last-set-line{
+        grid-column:1/4;
+        padding-left:0;
+        font-size:.74rem;
+        line-height:1.35;
+      }
+      .exercise-row{
+        overflow:hidden;
+      }
+    }
+
+</style>
 </head>
 <body>
 <div class="app">
