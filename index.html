@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#8B7667" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="CEO HQ" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon-192.svg" type="image/svg+xml" />
+  <title>Jasmine's CEO HQ</title>
+  <style>
+    :root{
+      --ivory:#FAF7F3;
+      --paper:#FFFDFC;
+      --taupe:#8B7667;
+      --taupe-dark:#5F5148;
+      --rose:#CFA7A2;
+      --rose-light:#F1E3E1;
+      --sage:#AAB7A2;
+      --gold:#C8A96B;
+      --ink:#3E3732;
+      --muted:#7A7069;
+      --line:#E8DED8;
+      --shadow:0 14px 36px rgba(77,60,49,.10);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      background:linear-gradient(180deg,#FAF7F3 0%,#F7F1EC 100%);
+      color:var(--ink);
+    }
+    .app{max-width:1150px;margin:auto;padding:18px 16px 90px}
+    header{
+      display:flex;justify-content:space-between;align-items:center;
+      gap:16px;padding:18px 2px 22px;
+    }
+    .eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.16em;color:var(--rose)}
+    h1,h2,h3{font-family:Georgia, 'Times New Roman', serif;margin:0}
+    h1{font-size:clamp(2rem,5vw,3.5rem);color:var(--taupe-dark)}
+    .date{color:var(--muted);font-size:.95rem;margin-top:6px}
+    .badge{background:var(--rose-light);color:var(--taupe-dark);padding:10px 14px;border-radius:999px;font-weight:700}
+    .hero{
+      background:linear-gradient(135deg,var(--paper),#F7ECEA);
+      border:1px solid var(--line);border-radius:26px;padding:24px;
+      box-shadow:var(--shadow);display:grid;grid-template-columns:1.4fr .8fr;gap:20px;
+    }
+    .focus{
+      display:inline-flex;align-items:center;gap:8px;background:white;border:1px solid var(--line);
+      border-radius:999px;padding:8px 12px;font-weight:700;margin-bottom:14px
+    }
+    .quote{font-family:Georgia,serif;font-size:1.25rem;line-height:1.5;color:var(--taupe-dark);margin-top:16px}
+    .progress-card{background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:20px;padding:18px}
+    .ring{
+      width:132px;height:132px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;
+      background:conic-gradient(var(--rose) var(--progress,0%), #EDE4DF 0);
+      position:relative
+    }
+    .ring:after{content:"";position:absolute;width:98px;height:98px;border-radius:50%;background:var(--paper)}
+    .ring span{position:relative;z-index:1;font-size:1.45rem;font-weight:800;color:var(--taupe-dark)}
+    nav{
+      display:flex;gap:10px;overflow:auto;padding:18px 0 10px;position:sticky;top:0;
+      background:linear-gradient(180deg,var(--ivory) 70%,rgba(250,247,243,0));z-index:10
+    }
+    nav button{
+      border:1px solid var(--line);background:var(--paper);color:var(--taupe-dark);
+      padding:10px 14px;border-radius:999px;font-weight:700;white-space:nowrap;cursor:pointer
+    }
+    nav button.active{background:var(--taupe);color:white;border-color:var(--taupe)}
+    .panel{display:none}.panel.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:16px}
+    .card{
+      grid-column:span 4;background:var(--paper);border:1px solid var(--line);
+      border-radius:22px;padding:18px;box-shadow:var(--shadow)
+    }
+    .card.wide{grid-column:span 8}.card.full{grid-column:1/-1}
+    .card h3{font-size:1.28rem;color:var(--taupe-dark);margin-bottom:12px}
+    .muted{color:var(--muted);font-size:.92rem}
+    .task{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line)}
+    .task:last-child{border-bottom:0}
+    input[type=checkbox]{width:20px;height:20px;accent-color:var(--rose)}
+    .task label{line-height:1.35;flex:1}
+    .task.done label{text-decoration:line-through;color:#9C928B}
+    .schedule{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    .day{background:#FBF8F5;border:1px solid var(--line);border-radius:18px;padding:14px;min-height:230px}
+    .day h3{font-size:1.05rem;margin-bottom:10px}
+    .block{padding:9px 10px;border-radius:12px;margin:7px 0;font-size:.84rem;line-height:1.35}
+    .job{background:#E6EEF6}.gym{background:#E8F0E5}.travel{background:#F7E4E7}
+    .uw{background:#FFF1C9}.appdev{background:#EEE6F7}.jg{background:#E7ECEA}.ceo{background:#F4EAD8}
+    .weekend-note{
+      margin-top:14px;background:linear-gradient(135deg,#F3E7E5,#FFFDFC);border:1px solid var(--line);
+      border-radius:18px;padding:16px;text-align:center;font-weight:700;color:var(--taupe-dark)
+    }
+    textarea,input[type=text],input[type=number]{
+      width:100%;border:1px solid var(--line);background:#FFFEFD;border-radius:12px;
+      padding:11px 12px;font:inherit;color:var(--ink);outline:none
+    }
+    textarea{min-height:90px;resize:vertical}
+    .metric{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line)}
+    .metric input{max-width:105px}
+    .btn{
+      border:0;background:var(--taupe);color:white;padding:11px 16px;border-radius:12px;
+      font-weight:800;cursor:pointer
+    }
+    .btn.secondary{background:var(--rose-light);color:var(--taupe-dark)}
+    .business-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .business-card{border:1px solid var(--line);border-radius:18px;padding:16px;background:#FFFEFD}
+    .business-card h3{margin-bottom:8px}
+    .footer-note{text-align:center;color:var(--muted);font-size:.85rem;margin-top:28px}
+    .save-toast{position:fixed;right:18px;bottom:18px;background:var(--taupe-dark);color:white;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);z-index:50;opacity:0;transform:translateY(10px);transition:.25s}.save-toast.show{opacity:1;transform:translateY(0)}.progress-entry{border:1px solid var(--line);background:#FFFEFD;border-radius:16px;padding:14px;margin:10px 0}.progress-entry .meta{font-size:.8rem;color:var(--muted);margin-bottom:6px}.summary-pill{border:1px solid var(--line);border-radius:16px;padding:14px;background:#FBF8F5}.summary-pill strong{display:block;font-size:1.5rem;color:var(--taupe-dark)}@media(max-width:850px){
+      .hero{grid-template-columns:1fr}
+      .card,.card.wide{grid-column:1/-1}
+      .schedule{grid-template-columns:1fr}
+      .day{min-height:auto}
+      .business-grid{grid-template-columns:1fr}
+      header{align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <div class="eyebrow">Your calm business & life dashboard</div>
+      <h1>CEO HQ</h1>
+      <div class="date" id="todayDate"></div>
+    </div>
+    <div class="badge">Weekends protected ✨</div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="focus" id="dayFocus">Today’s focus</div>
+      <h2 id="greeting">Good afternoon, Jasmine</h2>
+      <p class="muted">One focused block at a time. You do not need to do everything today.</p>
+      <div class="quote" id="quote"></div>
+    </div>
+    <div class="progress-card">
+      <div class="ring" id="progressRing"><span id="progressText">0%</span></div>
+      <div style="text-align:center;font-weight:800">Today’s progress</div>
+      <div class="muted" style="text-align:center;margin-top:4px" id="progressCaption">Start with one small win.</div>
+    </div>
+  </section>
+
+  <nav>
+    <button class="active" data-tab="today">Today</button>
+    <button data-tab="week">My Week</button>
+    <button data-tab="business">Business Hub</button>
+    <button data-tab="me">Me</button>
+    <button data-tab="review">Friday Review</button><button data-tab="progress">Progress</button>
+  </nav>
+
+  <main>
+    <section class="panel active" id="today">
+      <div class="grid">
+        <div class="card wide">
+          <h3>Today’s checklist</h3>
+          <div id="dailyTasks"></div>
+        </div>
+        <div class="card">
+          <h3>Top 3 priorities</h3>
+          <input type="text" data-save="priority1" placeholder="Priority one">
+          <input type="text" data-save="priority2" placeholder="Priority two" style="margin-top:9px">
+          <input type="text" data-save="priority3" placeholder="Priority three" style="margin-top:9px"><button class="btn section-save" data-section-save="priorities" style="margin-top:12px">Save priorities</button>
+        </div>
+        <div class="card">
+          <h3>Quick notes</h3>
+          <textarea data-save="quickNotes" placeholder="Ideas, reminders, anything on your mind..."></textarea><button class="btn section-save" data-section-save="notes" style="margin-top:12px">Save notes</button>
+        </div>
+        <div class="card">
+          <h3>Wellbeing check-in</h3>
+          <div class="metric"><span>Water</span><input type="number" min="0" max="10" data-save="water" placeholder="glasses"></div>
+          <div class="metric"><span>Mood /10</span><input type="number" min="1" max="10" data-save="mood" placeholder="/10"></div>
+          <div class="metric"><span>Read</span><input type="text" data-save="reading" placeholder="pages/mins"></div><button class="btn section-save" data-section-save="wellbeing" style="margin-top:12px">Save wellbeing</button>
+        </div>
+        <div class="card">
+          <h3>Today’s win</h3>
+          <textarea data-save="dailyWin" placeholder="What are you proud of today?"></textarea><button class="btn section-save" data-section-save="dailywin" style="margin-top:12px">Save today’s win</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="week">
+      <div class="card full">
+        <h3>Your Monday–Friday rhythm</h3>
+        <div class="schedule">
+          <div class="day"><h3>Monday — Travel</h3>
+            <div class="block job">8:00–1:00 Part-time job</div>
+            <div class="block gym">1:15–2:30 Gym + lunch</div>
+            <div class="block travel">3:00–4:30 Travel business</div>
+            <div class="block jg">4:30–5:00 JG admin</div>
+          </div>
+          <div class="day"><h3>Tuesday — UW</h3>
+            <div class="block job">8:00–1:00 Part-time job</div>
+            <div class="block gym">1:15–2:30 Gym / run + lunch</div>
+            <div class="block uw">3:00–4:30 UW learning</div>
+            <div class="block jg">4:30–5:00 JG admin</div>
+          </div>
+          <div class="day"><h3>Wednesday — App</h3>
+            <div class="block job">8:00–1:00 Part-time job</div>
+            <div class="block gym">1:15–2:30 Gym + lunch</div>
+            <div class="block appdev">3:00–4:30 TransformHER</div>
+            <div class="block jg">4:30–5:00 JG admin</div>
+          </div>
+          <div class="day"><h3>Thursday — Content</h3>
+            <div class="block job">8:00–1:00 Part-time job</div>
+            <div class="block gym">1:15–2:30 Pilates / training + lunch</div>
+            <div class="block travel">3:00–4:30 Travel content</div>
+            <div class="block jg">4:30–5:00 JG admin</div>
+          </div>
+          <div class="day"><h3>Friday — CEO</h3>
+            <div class="block job">8:00–1:00 Part-time job</div>
+            <div class="block gym">1:15–2:30 Gym / run + lunch</div>
+            <div class="block ceo">3:00–4:30 Review & planning</div>
+            <div class="block jg">4:30–5:00 JG admin</div>
+          </div>
+        </div>
+        <div class="weekend-note">Saturday + Sunday: no scheduled business work. Travel, rest, reading, family, fun and whatever you need. 🤍</div>
+      </div>
+    </section>
+
+    <section class="panel" id="business">
+      <div class="business-grid">
+        <div class="business-card">
+          <h3>✈️ Travel Business</h3>
+          <textarea data-save="travelTasks" placeholder="Content, bookings, leads, learning..."></textarea><button class="btn section-save" data-section-save="travel" style="margin-top:12px">Save travel section</button>
+        </div>
+        <div class="business-card">
+          <h3>⚡ Utilities Warehouse</h3>
+          <textarea data-save="uwTasks" placeholder="Training, product knowledge, practice..."></textarea><button class="btn section-save" data-section-save="uw" style="margin-top:12px">Save UW section</button>
+        </div>
+        <div class="business-card">
+          <h3>💜 TransformHER</h3>
+          <textarea data-save="appTasks" placeholder="Developer notes, testing, features..."></textarea><button class="btn section-save" data-section-save="app" style="margin-top:12px">Save app section</button>
+        </div>
+        <div class="business-card">
+          <h3>🌱 JG Groundcare</h3>
+          <textarea data-save="jgTasks" placeholder="Accounts, invoices, emails, admin..."></textarea><button class="btn section-save" data-section-save="jg" style="margin-top:12px">Save JG section</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="me">
+      <div class="grid">
+        <div class="card">
+          <h3>Movement</h3>
+          <div class="task"><input type="checkbox" data-track="movement1"><label>Complete today’s workout or walk</label></div>
+          <div class="task"><input type="checkbox" data-track="movement2"><label>5-minute mobility</label></div>
+        </div>
+        <div class="card">
+          <h3>Personal time</h3>
+          <div class="task"><input type="checkbox" data-track="personal1"><label>Read or enjoy something just for me</label></div>
+          <div class="task"><input type="checkbox" data-track="personal2"><label>Finish work by 5pm</label></div>
+        </div>
+        <div class="card">
+          <h3>Gratitude</h3>
+          <textarea data-save="gratitude" placeholder="Three things I’m grateful for..."></textarea><button class="btn section-save" data-section-save="gratitude" style="margin-top:12px">Save gratitude</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="review">
+      <div class="grid">
+        <div class="card wide">
+          <h3>Weekly reflection</h3>
+          <textarea data-save="weeklyProud" placeholder="What am I proud of this week?"></textarea>
+          <textarea data-save="weeklyWorked" placeholder="What worked well?" style="margin-top:10px"></textarea>
+          <textarea data-save="weeklyImprove" placeholder="What would make next week feel easier?" style="margin-top:10px"></textarea><button class="btn section-save" data-section-save="weeklyreflection" style="margin-top:12px">Save reflection</button>
+        </div>
+        <div class="card">
+          <h3>Weekly numbers</h3>
+          <div class="metric"><span>Travel income</span><input type="text" data-save="travelIncome" placeholder="£"></div>
+          <div class="metric"><span>UW income</span><input type="text" data-save="uwIncome" placeholder="£"></div>
+          <div class="metric"><span>JG income</span><input type="text" data-save="jgIncome" placeholder="£"></div>
+          <div class="metric"><span>Workouts</span><input type="number" data-save="workoutsDone"></div><button class="btn section-save" data-section-save="weeklynumbers" style="margin-top:12px">Save weekly numbers</button>
+        </div>
+        <div class="card full">
+          <h3>Next week’s one big focus</h3>
+          <input type="text" data-save="nextFocus" placeholder="The single thing that matters most next week">
+          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+            <button class="btn" onclick="saveAll()">Save my week</button>
+            <button class="btn secondary" onclick="resetDaily()">Reset today only</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  <section class="panel" id="progress"><div class="grid">
+<div class="card full"><h3>Weekly Progress</h3><div class="muted">Every saved section appears here for your end-of-week review.</div><div id="weekLabel" style="margin-top:12px;font-weight:800"></div><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap"><button class="btn secondary" id="prevWeek">← Previous</button><button class="btn secondary" id="nextWeek">Next →</button></div></div>
+<div class="card full"><h3>Week at a glance</h3><div class="business-grid" id="progressSummary"></div></div>
+<div class="card full"><h3>Saved entries</h3><div id="progressEntries"></div></div>
+</div></section></main>
+
+  <div class="footer-note">Your data stays in this browser on this device.</div><div class="save-toast" id="saveToast">Saved ✨</div>
+</div>
+
+<script>
+  const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const themes = {
+    Monday:["✈️ Travel Business","Bookings, follow-ups, learning and content planning"],
+    Tuesday:["⚡ Utilities Warehouse","Learning, product confidence and practice"],
+    Wednesday:["💜 TransformHER App","Testing, feedback, features and development"],
+    Thursday:["🎥 Travel Content","Film, edit, schedule and connect"],
+    Friday:["🌿 CEO Day","Review, organise, celebrate and plan"],
+    Saturday:["🤍 Protected Weekend","Rest, travel, fun and time for you"],
+    Sunday:["🤍 Protected Weekend","Rest, reset and time for you"]
+  };
+  const quotes = [
+    "A calm plan will take you further than a frantic one.",
+    "You are allowed to build slowly and still build something brilliant.",
+    "Consistency can look gentle.",
+    "Your life is not separate from the success you are creating.",
+    "One focused block is enough for today."
+  ];
+
+  const now = new Date();
+  const day = dayNames[now.getDay()];
+  document.getElementById("todayDate").textContent = now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  document.getElementById("greeting").textContent = `${greeting}, Jasmine`;
+  document.getElementById("dayFocus").textContent = themes[day][0];
+  document.getElementById("quote").textContent = `“${quotes[now.getDate()%quotes.length]}”`;
+
+  const weekdayTasks = {
+    Monday:["Part-time job 8am–1pm","Gym + lunch","Travel business focus block","30 mins JG admin","Finish work by 5pm"],
+    Tuesday:["Part-time job 8am–1pm","Training / run + lunch","UW learning block","30 mins JG admin","Finish work by 5pm"],
+    Wednesday:["Part-time job 8am–1pm","Gym + lunch","TransformHER development block","30 mins JG admin","Finish work by 5pm"],
+    Thursday:["Part-time job 8am–1pm","Pilates / training + lunch","Travel content block","30 mins JG admin","Finish work by 5pm"],
+    Friday:["Part-time job 8am–1pm","Training / run + lunch","CEO review and planning","30 mins JG admin","Close the week calmly"],
+    Saturday:["No business work","Enjoy the day","Do something that fills your cup"],
+    Sunday:["No business work","Rest and reset","Prepare gently for Monday"]
+  };
+
+  function dailyKey(name){ return `ceohq-${now.toISOString().slice(0,10)}-${name}`; }
+
+  const tasksEl = document.getElementById("dailyTasks");
+  weekdayTasks[day].forEach((text,i)=>{
+    const wrap=document.createElement("div"); wrap.className="task";
+    const cb=document.createElement("input"); cb.type="checkbox"; cb.dataset.daily=i;
+    cb.checked=localStorage.getItem(dailyKey("task"+i))==="1";
+    const label=document.createElement("label"); label.textContent=text;
+    if(cb.checked) wrap.classList.add("done");
+    cb.addEventListener("change",()=>{localStorage.setItem(dailyKey("task"+i),cb.checked?"1":"0");wrap.classList.toggle("done",cb.checked);updateProgress();});
+    wrap.append(cb,label); tasksEl.appendChild(wrap);
+  });
+
+  document.querySelectorAll("nav button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+      btn.classList.add("active"); document.getElementById(btn.dataset.tab).classList.add("active");
+    });
+  });
+
+  document.querySelectorAll("[data-save]").forEach(el=>{
+    const key="ceohq-"+el.dataset.save;
+    el.value=localStorage.getItem(key)||"";
+    el.addEventListener("input",()=>localStorage.setItem(key,el.value));
+  });
+
+  document.querySelectorAll("[data-track]").forEach(el=>{
+    const key="ceohq-"+el.dataset.track;
+    el.checked=localStorage.getItem(key)==="1";
+    el.addEventListener("change",()=>localStorage.setItem(key,el.checked?"1":"0"));
+  });
+
+  function updateProgress(){
+    const boxes=[...document.querySelectorAll("[data-daily]")];
+    const done=boxes.filter(b=>b.checked).length;
+    const pct=Math.round(done/boxes.length*100);
+    document.getElementById("progressRing").style.setProperty("--progress",pct+"%");
+    document.getElementById("progressText").textContent=pct+"%";
+    document.getElementById("progressCaption").textContent=pct===100?"You’ve done enough for today. ✨":pct>=60?"You’re making lovely progress.":pct>0?"Keep it gentle and focused.":"Start with one small win.";
+  }
+  updateProgress();
+
+  function saveAll(){
+    alert("Everything is saved automatically on this device ✨");
+  }
+  function resetDaily(){
+    document.querySelectorAll("[data-daily]").forEach((cb,i)=>{
+      cb.checked=false; localStorage.removeItem(dailyKey("task"+i)); cb.closest(".task").classList.remove("done");
+    });
+    updateProgress();
+  }
+
+const sectionFields={priorities:["priority1","priority2","priority3"],notes:["quickNotes"],wellbeing:["water","mood","reading"],dailywin:["dailyWin"],travel:["travelTasks"],uw:["uwTasks"],app:["appTasks"],jg:["jgTasks"],gratitude:["gratitude"],weeklyreflection:["weeklyProud","weeklyWorked","weeklyImprove"],weeklynumbers:["travelIncome","uwIncome","jgIncome","workoutsDone"]};
+function getWeekStart(date){const d=new Date(date);const n=d.getDay();d.setDate(d.getDate()-n+(n===0?-6:1));d.setHours(0,0,0,0);return d}
+function weekKey(date){return getWeekStart(date).toISOString().slice(0,10)}
+function getStore(){try{return JSON.parse(localStorage.getItem("ceohq-progress")||"{}")}catch{return {}}}
+function toast(m){const e=document.getElementById("saveToast");e.textContent=m;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1600)}
+function saveSection(sec){const st=getStore(),wk=weekKey(new Date());if(!st[wk])st[wk]=[];const values={};(sectionFields[sec]||[]).forEach(n=>{const e=document.querySelector(`[data-save="${n}"]`);values[n]=e?e.value.trim():""});st[wk].push({id:Date.now(),section:sec,date:new Date().toISOString(),values});localStorage.setItem("ceohq-progress",JSON.stringify(st));toast("Saved to Progress ✨");renderProgress()}
+document.querySelectorAll("[data-section-save]").forEach(b=>b.addEventListener("click",()=>saveSection(b.dataset.sectionSave)));
+let weekOffset=0;
+const labels={priorities:"Top priorities",notes:"Quick notes",wellbeing:"Wellbeing",dailywin:"Today’s win",travel:"Travel business",uw:"Utilities Warehouse",app:"TransformHER app",jg:"JG admin",gratitude:"Gratitude",weeklyreflection:"Weekly reflection",weeklynumbers:"Weekly numbers"};
+function renderProgress(){const start=new Date();start.setDate(start.getDate()+weekOffset*7);const ws=getWeekStart(start),we=new Date(ws);we.setDate(we.getDate()+6);const entries=getStore()[weekKey(ws)]||[];document.getElementById("weekLabel").textContent=`${ws.toLocaleDateString("en-GB",{day:"numeric",month:"short"})} – ${we.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}`;const c={};entries.forEach(e=>c[e.section]=(c[e.section]||0)+1);document.getElementById("progressSummary").innerHTML=[["Travel",c.travel||0],["UW",c.uw||0],["TransformHER",c.app||0],["JG Admin",c.jg||0],["Wellbeing",c.wellbeing||0],["Reflections",(c.dailywin||0)+(c.weeklyreflection||0)]].map(x=>`<div class="summary-pill"><strong>${x[1]}</strong>${x[0]} saves</div>`).join("");document.getElementById("progressEntries").innerHTML=entries.length?entries.slice().reverse().map(e=>`<div class="progress-entry"><div class="meta">${new Date(e.date).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div><h3 style="font-size:1.05rem;margin-bottom:8px">${labels[e.section]||e.section}</h3>${Object.entries(e.values).filter(x=>x[1]!=="").map(x=>`<div><strong>${x[0].replace(/([A-Z])/g," $1")}:</strong> ${x[1]}</div>`).join("")||"<div class='muted'>Saved with no text entered.</div>"}</div>`).join(""):"<div class='muted'>Nothing saved for this week yet.</div>"}
+document.getElementById("prevWeek").addEventListener("click",()=>{weekOffset--;renderProgress()});document.getElementById("nextWeek").addEventListener("click",()=>{weekOffset++;renderProgress()});renderProgress();
+
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js").catch(console.error);
+    });
+  }
+</script>
+</body>
+</html>
