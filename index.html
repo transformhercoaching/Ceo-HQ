@@ -111,12 +111,12 @@
     .save-toast{position:fixed;right:18px;bottom:18px;background:var(--taupe-dark);color:white;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);z-index:50;opacity:0;transform:translateY(10px);transition:.25s}.save-toast.show{opacity:1;transform:translateY(0)}.progress-entry{border:1px solid var(--line);background:#FFFEFD;border-radius:16px;padding:14px;margin:10px 0}.progress-entry .meta{font-size:.8rem;color:var(--muted);margin-bottom:6px}.summary-pill{border:1px solid var(--line);border-radius:16px;padding:14px;background:#FBF8F5}.summary-pill strong{display:block;font-size:1.5rem;color:var(--taupe-dark)}.call-card{border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;background:#fffefd}.call-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.call-date{font-weight:800;color:var(--rose);font-size:.9rem}.call-title{font-family:Georgia,serif;font-size:1.15rem;margin:5px 0}.call-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.call-actions a{text-decoration:none}.tiny-btn{border:1px solid var(--line);background:var(--paper);color:var(--taupe-dark);padding:8px 10px;border-radius:10px;font-weight:700;cursor:pointer}.tiny-btn.attended{background:var(--sage);color:white}.call-notes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}@media(max-width:650px){.call-notes{grid-template-columns:1fr}}
     .training-progress{height:12px;background:#eee7e3;border-radius:999px;overflow:hidden;margin-top:12px}
     #trainingProgressBar{height:100%;width:0;background:var(--sage);transition:.25s}
-    .training-day{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);cursor:pointer}
+    .training-day{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
     .training-day:last-child{border-bottom:0}
     .training-day input{flex:0 0 auto}
     .training-day-copy{flex:1}
     .training-day-copy strong{display:block;color:var(--taupe-dark)}
-    .training-day-copy span{font-size:.9rem;color:var(--muted)}
+    .training-day-copy span{font-size:.9rem;color:var(--muted)}.open-workout-btn{border:0;background:transparent;color:var(--taupe-dark);padding:12px 8px;font-size:1.2rem;cursor:pointer;touch-action:manipulation}
     .exercise-row{padding:12px 0;border-bottom:1px dashed var(--line)}
     .exercise-row:last-child{border-bottom:0}
     .exercise-top{display:flex;justify-content:space-between;gap:12px}
@@ -128,9 +128,9 @@
 
     .exercise-history{margin-top:10px;padding:10px 12px;background:#faf7f3;border-radius:12px;font-size:.88rem;color:var(--muted)}
     .exercise-history strong{color:var(--taupe-dark)}
-    .set-grid{display:grid;grid-template-columns:54px 1fr 1fr;gap:8px;align-items:center;margin-top:8px}
+    .set-grid{display:grid;grid-template-columns:48px 1fr 1fr;gap:8px;align-items:center;margin-top:10px}
     .set-grid .set-label{font-size:.84rem;font-weight:800;color:var(--muted)}
-    .set-grid input{margin-top:0;text-align:center}
+    .set-grid input{margin-top:0;text-align:center}.last-set-line{grid-column:2/4;font-size:.78rem;color:var(--muted);margin-top:-3px;padding-left:2px}.last-set-line strong{color:var(--taupe-dark)}.set-column-labels{display:grid;grid-template-columns:48px 1fr 1fr;gap:8px;margin-top:10px;font-size:.76rem;font-weight:800;color:var(--muted);text-align:center}.set-column-labels span:first-child{text-align:left}
     .progression-tip{margin-top:8px;padding:9px 11px;border-radius:11px;background:#f2eee9;font-size:.85rem;line-height:1.4}
     .session-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .history-session{padding:14px 0;border-bottom:1px dashed var(--line)}
@@ -138,7 +138,7 @@
     .history-session summary{cursor:pointer;font-weight:800;color:var(--taupe-dark)}
     .history-exercise{margin-top:9px;font-size:.9rem}
     .history-exercise strong{display:block}
-    .session-status{margin-top:10px;font-weight:800;color:var(--sage)}
+    .session-status{margin-top:10px;font-weight:800;color:var(--sage)}#selectedWorkoutTitle{scroll-margin-top:110px}
 @media(max-width:850px){
       .hero{grid-template-columns:1fr}
       .card,.card.wide{grid-column:1/-1}
@@ -533,12 +533,29 @@ function renderTrainingWeek(){
    const plan=trainingPlan[day], checked=localStorage.getItem(trainingKey(day))==="1";
    const row=document.createElement("div"); row.className="training-day";
    row.innerHTML=`<input type="checkbox" ${checked?"checked":""} aria-label="Complete ${day}">
-     <div class="training-day-copy"><strong>${day}</strong><span>${plan.title}</span></div>
-     <span>›</span>`;
-   row.querySelector("input").addEventListener("click",e=>{
-     e.stopPropagation(); localStorage.setItem(trainingKey(day),e.target.checked?"1":"0"); updateTrainingProgress();
+     <div class="training-day-copy" role="button" tabindex="0"><strong>${day}</strong><span>${plan.title}</span></div>
+     <button type="button" class="open-workout-btn" aria-label="Open ${day} workout">›</button>`;
+   const checkbox=row.querySelector("input");
+   const copy=row.querySelector(".training-day-copy");
+   const openBtn=row.querySelector(".open-workout-btn");
+   checkbox.addEventListener("click",e=>{
+     e.stopPropagation();
+     localStorage.setItem(trainingKey(day),e.target.checked?"1":"0");
+     updateTrainingProgress();
    });
-   row.addEventListener("click",()=>showWorkout(day));
+   const openWorkout=(e)=>{
+     if(e)e.stopPropagation();
+     showWorkout(day);
+     const target=document.getElementById("selectedWorkoutTitle");
+     if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
+   };
+   copy.addEventListener("click",openWorkout);
+   copy.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openWorkout(e);}});
+   openBtn.addEventListener("click",openWorkout);
+   row.addEventListener("click",e=>{
+     if(e.target===checkbox||e.target===openBtn||copy.contains(e.target))return;
+     openWorkout(e);
+   });
    wrap.appendChild(row);
  });
  updateTrainingProgress();
@@ -585,25 +602,33 @@ function progressionMessage(item,lastExercise){
 function workoutRows(day,target,inputs=true){
   const plan=trainingPlan[day], wrap=document.getElementById(target); if(!wrap)return;
   const last=lastSessionFor(day);
+
   wrap.innerHTML=plan.items.map((x,i)=>{
     const prior=last&&last.exercises?last.exercises[i]:null;
     const sets=targetSets(x[1]);
-    const setInputs=inputs?Array.from({length:sets},(_,s)=>{
-      const draftKey=`ceohq-draft-${day}-${i}-${s}`;
-      let draft={}; try{draft=JSON.parse(localStorage.getItem(draftKey)||"{}")}catch(e){}
-      return `<div class="set-grid"><div class="set-label">Set ${s+1}</div>
-      <input inputmode="decimal" data-weight="${day}|${i}|${s}" placeholder="Weight" value="${draft.weight||""}">
-      <input inputmode="numeric" data-reps="${day}|${i}|${s}" placeholder="Reps" value="${draft.reps||""}"></div>`;
-    }).join(""):"";
-    const lastText=prior&&prior.sets&&prior.sets.length
-      ? prior.sets.map((s,idx)=>`Set ${idx+1}: ${s.weight||"—"} kg × ${s.reps||"—"}`).join(" · ")
-      : "No previous result saved.";
+
+    const setInputs=inputs?`
+      <div class="set-column-labels"><span></span><span>Weight</span><span>Reps</span></div>
+      ${Array.from({length:sets},(_,s)=>{
+        const draftKey=`ceohq-draft-${day}-${i}-${s}`;
+        let draft={}; try{draft=JSON.parse(localStorage.getItem(draftKey)||"{}")}catch(e){}
+        const lastSet=prior&&prior.sets?prior.sets[s]:null;
+        const lastWeight=lastSet&&lastSet.weight!==""?lastSet.weight:"—";
+        const lastReps=lastSet&&lastSet.reps!==""?lastSet.reps:"—";
+        return `<div class="set-grid">
+          <div class="set-label">Set ${s+1}</div>
+          <input inputmode="decimal" data-weight="${day}|${i}|${s}" placeholder="${lastWeight!=="—"?"Last: "+lastWeight+" kg":"Weight"}" value="${draft.weight||""}">
+          <input inputmode="numeric" data-reps="${day}|${i}|${s}" placeholder="${lastReps!=="—"?"Last: "+lastReps:"Reps"}" value="${draft.reps||""}">
+          <div class="last-set-line"><strong>Last time:</strong> ${lastWeight} kg × ${lastReps} reps</div>
+        </div>`;
+      }).join("")}`:"";
+
     return `<div class="${target==="todayWorkoutExercises"?"today-exercise":"exercise-row"}">
       <div class="exercise-top"><strong>${x[0]}</strong><small>${x[1]}</small></div>
-      ${inputs?`<div class="exercise-history"><strong>Last time:</strong> ${lastText}</div>
-      <div class="progression-tip"><strong>Next target:</strong> ${progressionMessage(x,prior)}</div>${setInputs}`:""}
+      ${inputs?`<div class="progression-tip"><strong>Progression:</strong> ${progressionMessage(x,prior)}</div>${setInputs}`:""}
     </div>`;
   }).join("");
+
   if(inputs){
     wrap.querySelectorAll("[data-weight],[data-reps]").forEach(el=>{
       el.addEventListener("input",()=>{
