@@ -6,9 +6,10 @@
   <meta name="theme-color" content="#8B7667" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="CEO HQ" />
+  <meta name="apple-mobile-web-app-title" content="TransformHER CEO" />
 <link rel="icon" href="icon-192.svg" type="image/svg+xml" />
-  <title>Jasmine's CEO HQ</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>TransformHER CEO</title>
   <style>
     :root{
       --ivory:#FAF7F3;
@@ -204,7 +205,7 @@
   <header>
     <div>
       <div class="eyebrow">Your calm business & life dashboard</div>
-      <h1>CEO HQ</h1>
+      <h1>TransformHER CEO</h1>
       <div class="date" id="todayDate"></div>
     </div>
     <div class="badge">Weekends protected ✨</div>
@@ -469,34 +470,79 @@
   const themes = {
     Monday:["✈️ Travel Business","Bookings, follow-ups, learning and content planning"],
     Tuesday:["⚡ Utilities Warehouse","Learning, product confidence and practice"],
-    Wednesday:["💜 TransformHER App","Testing, feedback, features and development"],
+    Wednesday:["💜 TransformHER CEO","Testing, feedback, features and development"],
     Thursday:["🎥 Travel Content","Film, edit, schedule and connect"],
     Friday:["🌿 CEO Day","Review, organise, celebrate and plan"],
     Saturday:["🤍 Protected Weekend","Rest, travel, fun and time for you"],
     Sunday:["🤍 Protected Weekend","Rest, reset and time for you"]
   };
-  const quotes = [
-    "A calm plan will take you further than a frantic one.",
-    "You are allowed to build slowly and still build something brilliant.",
-    "Consistency can look gentle.",
-    "Your life is not separate from the success you are creating.",
-    "One focused block is enough for today."
-  ];
+  const welcomeMessages = {
+    morning:[
+      "Ready to lead today?",
+      "What are we building today?",
+      "Time to move the needle.",
+      "Build with intention today.",
+      "One focused day at a time.",
+      "Protect your energy. Prioritise your goals.",
+      "Your CEO dashboard is ready.",
+      "Small actions. Big vision.",
+      "Today’s decisions shape tomorrow’s freedom.",
+      "Lead yourself well today."
+    ],
+    afternoon:[
+      "Keep the momentum going.",
+      "What’s the next priority?",
+      "Progress beats perfection.",
+      "One more step forward.",
+      "Keep building.",
+      "Small wins still count.",
+      "Keep moving the needle.",
+      "Every action compounds."
+    ],
+    evening:[
+      "Reflect. Reset. Recharge.",
+      "Celebrate today’s wins.",
+      "You’re one step closer.",
+      "Recovery is productive too.",
+      "Close the chapter well.",
+      "Great leaders know when to rest.",
+      "Tomorrow starts with tonight.",
+      "Be proud of today’s progress."
+    ]
+  };
 
   const now = new Date();
   const day = dayNames[now.getDay()];
   document.getElementById("todayDate").textContent = now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   const hour = now.getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-  const greetingText = greeting;
-  document.getElementById("greeting").textContent = `${greeting}, Jasmine`;
+  const greetingText = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const timeGroup = hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening";
+
+  function dateSeed(date=new Date()){
+    return Number(`${date.getFullYear()}${String(date.getMonth()+1).padStart(2,"0")}${String(date.getDate()).padStart(2,"0")}`);
+  }
+
+  function getDailyWelcome(){
+    if(day==="Monday") return "Fresh week. Lead it with intention.";
+    if(day==="Friday") return "Finish the week strong — then switch off.";
+    if(day==="Sunday") return "Recovery is part of the plan.";
+    const messages=welcomeMessages[timeGroup];
+    return messages[dateSeed(now)%messages.length];
+  }
+
+  function renderWelcome(message=getDailyWelcome()){
+    const name = dateSeed(now)%4===0 ? "CEO" : "Jasmine";
+    document.getElementById("greeting").textContent = `${greetingText}, ${name}`;
+    document.getElementById("quote").textContent = message;
+  }
+
+  renderWelcome();
   document.getElementById("dayFocus").textContent = themes[day][0];
-  document.getElementById("quote").textContent = `“${quotes[now.getDate()%quotes.length]}”`;
 
   const weekdayTasks = {
     Monday:["Part-time job 8am–1pm","Gym + lunch","Travel business focus block","30 mins JG admin","Finish work by 5pm"],
     Tuesday:["Part-time job 8am–1pm","Training / run + lunch","UW learning block","30 mins JG admin","Finish work by 5pm"],
-    Wednesday:["Part-time job 8am–1pm","Gym + lunch","TransformHER development block","30 mins JG admin","Finish work by 5pm"],
+    Wednesday:["Part-time job 8am–1pm","Gym + lunch","TransformHER CEO development block","30 mins JG admin","Finish work by 5pm"],
     Thursday:["Part-time job 8am–1pm","Pilates / training + lunch","Travel content block","30 mins JG admin","Finish work by 5pm"],
     Friday:["Part-time job 8am–1pm","Training / run + lunch","CEO review and planning","30 mins JG admin","Close the week calmly"],
     Saturday:["No business work","Enjoy the day","Do something that fills your cup"],
@@ -566,6 +612,8 @@
     if(count)count.textContent=`${done}/3 complete`;
     if(fill)fill.style.width=`${done/3*100}%`;
     if(celebration)celebration.classList.toggle("show",done===3);
+    if(done===3) renderWelcome("Incredible work — your top priorities are complete. ✨");
+    else renderWelcome();
     checks.forEach(cb=>cb.closest(".priority-row")?.classList.toggle("complete",cb.checked));
     updateTodayFocus();
     updateProgress();
@@ -617,7 +665,8 @@
     const pct=Math.round(done/boxes.length*100);
     document.getElementById("progressRing").style.setProperty("--progress",pct+"%");
     document.getElementById("progressText").textContent=pct+"%";
-    document.getElementById("progressCaption").textContent=pct===100?"You’ve done enough for today. ✨":pct>=60?"You’re making lovely progress.":pct>0?"Keep it gentle and focused.":"Start with one small win.";
+    document.getElementById("progressCaption").textContent=pct===100?"CEO mode: complete. You’ve done enough for today. ✨":pct>=60?"You’re making lovely progress.":pct>0?"Keep it gentle and focused.":"Start with one small win.";
+    if(pct===100) renderWelcome("CEO mode: complete. See you tomorrow. ✅");
   }
   updateProgress();
 
@@ -680,7 +729,7 @@ function toast(m){const e=document.getElementById("saveToast");e.textContent=m;e
 function saveSection(sec){const st=getStore(),wk=weekKey(new Date());if(!st[wk])st[wk]=[];const values={};(sectionFields[sec]||[]).forEach(n=>{const e=document.querySelector(`[data-save="${n}"]`);values[n]=e?e.value.trim():""});st[wk].push({id:Date.now(),section:sec,date:new Date().toISOString(),values});localStorage.setItem("ceohq-progress",JSON.stringify(st));toast("Saved to Progress ✨");renderProgress()}
 document.querySelectorAll("[data-section-save]").forEach(b=>b.addEventListener("click",()=>saveSection(b.dataset.sectionSave)));
 let weekOffset=0;
-const labels={priorities:"Top priorities",notes:"Quick notes",wellbeing:"Wellbeing",dailywin:"Today’s win",travel:"Travel business",uw:"Utilities Warehouse",app:"TransformHER app",jg:"JG admin",gratitude:"Gratitude",weeklyreflection:"Weekly reflection",weeklynumbers:"Weekly numbers",travelcall:"Travel call"};
+const labels={priorities:"Top priorities",notes:"Quick notes",wellbeing:"Wellbeing",dailywin:"Today’s win",travel:"Travel business",uw:"Utilities Warehouse",app:"TransformHER CEO",jg:"JG admin",gratitude:"Gratitude",weeklyreflection:"Weekly reflection",weeklynumbers:"Weekly numbers",travelcall:"Travel call"};
 function renderProgress(){const start=new Date();start.setDate(start.getDate()+weekOffset*7);const ws=getWeekStart(start),we=new Date(ws);we.setDate(we.getDate()+6);const entries=getStore()[weekKey(ws)]||[];document.getElementById("weekLabel").textContent=`${ws.toLocaleDateString("en-GB",{day:"numeric",month:"short"})} – ${we.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}`;const c={};entries.forEach(e=>c[e.section]=(c[e.section]||0)+1);document.getElementById("progressSummary").innerHTML=[["Travel",c.travel||0],["UW",c.uw||0],["TransformHER",c.app||0],["JG Admin",c.jg||0],["Wellbeing",c.wellbeing||0],["Reflections",(c.dailywin||0)+(c.weeklyreflection||0)]].map(x=>`<div class="summary-pill"><strong>${x[1]}</strong>${x[0]} saves</div>`).join("");document.getElementById("progressEntries").innerHTML=entries.length?entries.slice().reverse().map(e=>`<div class="progress-entry"><div class="meta">${new Date(e.date).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div><h3 style="font-size:1.05rem;margin-bottom:8px">${labels[e.section]||e.section}</h3>${Object.entries(e.values).filter(x=>x[1]!=="").map(x=>`<div><strong>${x[0].replace(/([A-Z])/g," $1")}:</strong> ${x[1]}</div>`).join("")||"<div class='muted'>Saved with no text entered.</div>"}</div>`).join(""):"<div class='muted'>Nothing saved for this week yet.</div>"}
 document.getElementById("prevWeek").addEventListener("click",()=>{weekOffset--;renderProgress()});document.getElementById("nextWeek").addEventListener("click",()=>{weekOffset++;renderProgress()});renderProgress();
 
@@ -998,6 +1047,9 @@ document.getElementById("saveTrainingNotes").addEventListener("click",()=>{local
 document.getElementById("trainingNotes").value=localStorage.getItem("ceohq-training-notes")||"";
 renderTrainingWeek(); renderTodayWorkout(); renderStairs(); showWorkout(new Date().toLocaleDateString("en-GB",{weekday:"long"})); renderWorkoutHistory();
 
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js").catch(()=>{}));
+  }
 </script>
 </body>
 </html>
