@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#8B7667" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="CEO HQ" />
+<link rel="icon" href="icon-192.svg" type="image/svg+xml" />
+  <title>Jasmine's CEO HQ</title>
+  <style>
+    :root{
+      --ivory:#FAF7F3;
+      --paper:#FFFDFC;
+      --taupe:#8B7667;
+      --taupe-dark:#5F5148;
+      --rose:#CFA7A2;
+      --rose-light:#F1E3E1;
+      --sage:#AAB7A2;
+      --gold:#C8A96B;
+      --ink:#3E3732;
+      --muted:#7A7069;
+      --line:#E8DED8;
+      --shadow:0 14px 36px rgba(77,60,49,.10);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      background:linear-gradient(180deg,#FAF7F3 0%,#F7F1EC 100%);
+      color:var(--ink);
+    }
+    .app{max-width:1150px;margin:auto;padding:18px 16px 90px}
+    header{
+      display:flex;justify-content:space-between;align-items:center;
+      gap:16px;padding:18px 2px 22px;
+    }
+    .eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.16em;color:var(--rose)}
+    h1,h2,h3{font-family:Georgia, 'Times New Roman', serif;margin:0}
+    h1{font-size:clamp(2rem,5vw,3.5rem);color:var(--taupe-dark)}
+    .date{color:var(--muted);font-size:.95rem;margin-top:6px}
+    .badge{background:var(--rose-light);color:var(--taupe-dark);padding:10px 14px;border-radius:999px;font-weight:700}
+    .hero{
+      background:linear-gradient(135deg,var(--paper),#F7ECEA);
+      border:1px solid var(--line);border-radius:26px;padding:24px;
+      box-shadow:var(--shadow);display:grid;grid-template-columns:1.4fr .8fr;gap:20px;
+    }
+    .focus{
+      display:inline-flex;align-items:center;gap:8px;background:white;border:1px solid var(--line);
+      border-radius:999px;padding:8px 12px;font-weight:700;margin-bottom:14px
+    }
+    .quote{font-family:Georgia,serif;font-size:1.25rem;line-height:1.5;color:var(--taupe-dark);margin-top:16px}
+    .progress-card{background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:20px;padding:18px}
+    .ring{
+      width:132px;height:132px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;
+      background:conic-gradient(var(--rose) var(--progress,0%), #EDE4DF 0);
+      position:relative
+    }
+    .ring:after{content:"";position:absolute;width:98px;height:98px;border-radius:50%;background:var(--paper)}
+    .ring span{position:relative;z-index:1;font-size:1.45rem;font-weight:800;color:var(--taupe-dark)}
+    nav{
+      display:flex;gap:10px;overflow:auto;padding:18px 0 10px;position:sticky;top:0;
+      background:linear-gradient(180deg,var(--ivory) 70%,rgba(250,247,243,0));z-index:10
+    }
+    nav button{
+      border:1px solid var(--line);background:var(--paper);color:var(--taupe-dark);
+      padding:10px 14px;border-radius:999px;font-weight:700;white-space:nowrap;cursor:pointer
+    }
+    nav button.active{background:var(--taupe);color:white;border-color:var(--taupe)}
+    .panel{display:none}.panel.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:16px}
+    .card{
+      grid-column:span 4;background:var(--paper);border:1px solid var(--line);
+      border-radius:22px;padding:18px;box-shadow:var(--shadow)
+    }
+    .card.wide{grid-column:span 8}.card.full{grid-column:1/-1}
+    .card h3{font-size:1.28rem;color:var(--taupe-dark);margin-bottom:12px}
+    .muted{color:var(--muted);font-size:.92rem}
+    .task{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line)}
+    .task:last-child{border-bottom:0}
+    input[type=checkbox]{width:20px;height:20px;accent-color:var(--rose)}
+    .task label{line-height:1.35;flex:1}
+    .task.done label{text-decoration:line-through;color:#9C928B}
+    .schedule{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    .day{background:#FBF8F5;border:1px solid var(--line);border-radius:18px;padding:14px;min-height:230px}
+    .day h3{font-size:1.05rem;margin-bottom:10px}
+    .block{padding:9px 10px;border-radius:12px;margin:7px 0;font-size:.84rem;line-height:1.35}
+    .job{background:#E6EEF6}.gym{background:#E8F0E5}.travel{background:#F7E4E7}
+    .uw{background:#FFF1C9}.appdev{background:#EEE6F7}.jg{background:#E7ECEA}.ceo{background:#F4EAD8}
+    .weekend-note{
+      margin-top:14px;background:linear-gradient(135deg,#F3E7E5,#FFFDFC);border:1px solid var(--line);
+      border-radius:18px;padding:16px;text-align:center;font-weight:700;color:var(--taupe-dark)
+    }
+    textarea,input[type=text],input[type=number]{
+      width:100%;border:1px solid var(--line);background:#FFFEFD;border-radius:12px;
+      padding:11px 12px;font:inherit;color:var(--ink);outline:none
+    }
+    textarea{min-height:90px;resize:vertical}
+    .metric{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line)}
+    .metric input{max-width:105px}
+    .btn{
+      border:0;background:var(--taupe);color:white;padding:11px 16px;border-radius:12px;
+      font-weight:800;cursor:pointer
+    }
+    .btn.secondary{background:var(--rose-light);color:var(--taupe-dark)}
+    .business-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .business-card{border:1px solid var(--line);border-radius:18px;padding:16px;background:#FFFEFD}
+    .business-card h3{margin-bottom:8px}
+    .footer-note{text-align:center;color:var(--muted);font-size:.85rem;margin-top:28px}
+    .save-toast{position:fixed;right:18px;bottom:18px;background:var(--taupe-dark);color:white;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);z-index:50;opacity:0;transform:translateY(10px);transition:.25s}.save-toast.show{opacity:1;transform:translateY(0)}.progress-entry{border:1px solid var(--line);background:#FFFEFD;border-radius:16px;padding:14px;margin:10px 0}.progress-entry .meta{font-size:.8rem;color:var(--muted);margin-bottom:6px}.summary-pill{border:1px solid var(--line);border-radius:16px;padding:14px;background:#FBF8F5}.summary-pill strong{display:block;font-size:1.5rem;color:var(--taupe-dark)}.call-card{border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;background:#fffefd}.call-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.call-date{font-weight:800;color:var(--rose);font-size:.9rem}.call-title{font-family:Georgia,serif;font-size:1.15rem;margin:5px 0}.call-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.call-actions a{text-decoration:none}.tiny-btn{border:1px solid var(--line);background:var(--paper);color:var(--taupe-dark);padding:8px 10px;border-radius:10px;font-weight:700;cursor:pointer}.tiny-btn.attended{background:var(--sage);color:white}.call-notes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}@media(max-width:650px){.call-notes{grid-template-columns:1fr}}
+    .training-progress{height:12px;background:#eee7e3;border-radius:999px;overflow:hidden;margin-top:12px}
+    #trainingProgressBar{height:100%;width:0;background:var(--sage);transition:.25s}
+    .training-day{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    .training-day:last-child{border-bottom:0}
+    .training-day input{flex:0 0 auto}
+    .training-day-copy{flex:1}
+    .training-day-copy strong{display:block;color:var(--taupe-dark)}
+    .training-day-copy span{font-size:.9rem;color:var(--muted)}.open-workout-btn{border:0;background:transparent;color:var(--taupe-dark);padding:12px 8px;font-size:1.2rem;cursor:pointer;touch-action:manipulation}
+    .exercise-row{padding:12px 0;border-bottom:1px dashed var(--line)}
+    .exercise-row:last-child{border-bottom:0}
+    .exercise-top{display:flex;justify-content:space-between;gap:12px}
+    .exercise-row small{color:var(--muted)}
+    .exercise-row input{margin-top:8px}
+    .interval-row{display:grid;grid-template-columns:52px 1fr auto;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.88rem}
+    .notice{background:#fff9ec;border-left:4px solid #d8b56a;padding:12px;border-radius:12px;color:#6e5c33;line-height:1.45;margin-top:12px}
+    .today-exercise{padding:8px 0;border-bottom:1px dashed var(--line)}
+
+    .exercise-history{margin-top:10px;padding:10px 12px;background:#faf7f3;border-radius:12px;font-size:.88rem;color:var(--muted)}
+    .exercise-history strong{color:var(--taupe-dark)}
+    .set-grid{display:grid;grid-template-columns:54px 1fr 1fr;gap:8px;align-items:center;margin-top:8px}
+    .set-grid .set-label{font-size:.84rem;font-weight:800;color:var(--muted)}
+    .set-grid input{margin-top:0;text-align:center}
+    .progression-tip{margin-top:8px;padding:9px 11px;border-radius:11px;background:#f2eee9;font-size:.85rem;line-height:1.4}
+    .session-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .history-session{padding:14px 0;border-bottom:1px dashed var(--line)}
+    .history-session:last-child{border-bottom:0}
+    .history-session summary{cursor:pointer;font-weight:800;color:var(--taupe-dark)}
+    .history-exercise{margin-top:9px;font-size:.9rem}
+    .history-exercise strong{display:block}
+    .session-status{margin-top:10px;font-weight:800;color:var(--sage)}#selectedWorkoutTitle{scroll-margin-top:110px}
+@media(max-width:850px){
+      .hero{grid-template-columns:1fr}
+      .card,.card.wide{grid-column:1/-1}
+      .schedule{grid-template-columns:1fr}
+      .day{min-height:auto}
+      .business-grid{grid-template-columns:1fr}
+      header{align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <div class="eyebrow">Your calm business & life dashboard</div>
+      <h1>CEO HQ</h1>
+      <div class="date" id="todayDate"></div>
+    </div>
+    <div class="badge">Weekends protected ✨</div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="focus" id="dayFocus">Today’s focus</div>
+      <h2 id="greeting">Good afternoon, Jasmine</h2>
+      <p class="muted">One focused block at a time. You do not need to do everything today.</p>
+      <div class="quote" id="quote"></div>
+    </div>
+    <div class="progress-card">
+      <div class="ring" id="progressRing"><span id="progressText">0%</span></div>
+      <div style="text-align:center;font-weight:800">Today’s progress</div>
+      <div class="muted" style="text-align:center;margin-top:4px" id="progressCaption">Start with one small win.</div>
+    </div>
+  </section>
+
+  <nav>
+    <button class="active" data-tab="today">Today</button>
+    <button data-tab="week">My Week</button>
+    <button data-tab="business">Business Hub</button><button data-tab="calls">Travel Calls</button><button data-tab="training">Training</button>
+    <button data-tab="me">Me</button>
+    <button data-tab="review">Friday Review</button><button data-tab="progress">Progress</button>
+  </nav>
+
+  <main>
+    <section class="panel active" id="today">
+      <div class="grid">
+
+        <div class="card wide" id="todayWorkoutCard">
+          <h3 id="todayWorkoutTitle">Today’s training</h3>
+          <p class="muted" id="todayWorkoutSubtitle"></p>
+          <div id="todayWorkoutExercises"></div>
+          <button class="btn" id="completeTodayWorkout" style="margin-top:12px">Mark workout complete</button>
+        </div>
+        <div class="card wide">
+          <h3>Today’s checklist</h3>
+          <div id="dailyTasks"></div>
+        </div>
+        <div class="card">
+          <h3>Top 3 priorities</h3>
+          <input type="text" data-save="priority1" placeholder="Priority one">
+          <input type="text" data-save="priority2" placeholder="Priority two" style="margin-top:9px">
+          <input type="text" data-save="priority3" placeholder="Priority three" style="margin-top:9px"><button class="btn section-save" data-section-save="priorities" style="margin-top:12px">Save priorities</button>
+        </div>
+        <div class="card">
+          <h3>Quick notes</h3>
+          <textarea data-save="quickNotes" placeholder="Ideas, reminders, anything on your mind..."></textarea><button class="btn section-save" data-section-save="notes" style="margin-top:12px">Save notes</button>
+        </div>
+        <div class="card">
+          <h3>Wellbeing check-in</h3>
+          <div class="metric"><span>Water</span><input type="number" min="0" max="10" data-save="water" placeholder="glasses"></div>
+          <div class="metric"><span>Mood /10</span><input type="number" min="1" max="10" data-save="mood" placeholder="/10"></div>
+          <div class="metric"><span>Read</span><input type="text" data-save="reading" placeholder="pages/mins"></div><button class="btn section-save" data-section-save="wellbeing" style="margin-top:12px">Save wellbeing</button>
+        </div>
+        <div class="card">
+          <h3>Today’s win</h3>
+          <textarea data-save="dailyWin" placeholder="What are you proud of today?"></textarea><button class="btn section-save" data-section-save="dailywin" style="margin-top:12px">Save today’s win</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="week">
+      <div class="card full">
+        <h3>Your Monday–Friday rhythm</h3>
+        <div class="schedule">
+          <div class="day"><h3>Monday — Travel</h3>
+            <div class="block job">8:00–1:00 Part-time job</div>
+            <div class="block gym">1:15–2:30 Full Body A + StairMaster</div>
+            <div class="block travel">3:00–4:30 Travel business</div>
+            <div class="block jg">4:30–5:00 JG admin</div>
+          </div>
+          <div class="day"><h3>Tuesday — UW</h3>
+            <div class="block job">8:00–1:00 Part-time job</div>
+            <div class="block gym">1:15–2:30 Run</div>
+            <div class="block uw">3:00–4:30 UW learning</div>
+            <div class="block jg">4:30–5:00 JG admin</div>
+          </div>
+          <div class="day"><h3>Wednesday — App</h3>
+            <div class="block job">8:00–1:00 Part-time job</div>
+            <div class="block gym">1:15–2:30 Full Body B + Bike</div>
+            <div class="block appdev">3:00–4:30 TransformHER</div>
+            <div class="block jg">4:30–5:00 JG admin</div>
+          </div>
+          <div class="day"><h3>Thursday — Content</h3>
+            <div class="block job">8:00–1:00 Part-time job</div>
+            <div class="block gym">1:15–2:30 Pilates & mobility</div>
+            <div class="block travel">3:00–4:30 Travel content</div>
+            <div class="block jg">4:30–5:00 JG admin</div>
+          </div>
+          <div class="day"><h3>Friday — CEO</h3>
+            <div class="block job">8:00–1:00 Part-time job</div>
+            <div class="block gym">1:15–2:30 Run</div>
+            <div class="block ceo">3:00–4:30 Review & planning</div>
+            <div class="block jg">4:30–5:00 JG admin</div>
+          </div>
+        </div>
+        <div class="weekend-note"><strong>Saturday:</strong> Home workout &nbsp; • &nbsp; <strong>Sunday:</strong> Rest or gentle walk.<br>No scheduled business work — travel, rest, reading, family and fun. 🤍</div>
+      </div>
+    </section>
+
+    <section class="panel" id="business">
+      <div class="business-grid">
+        <div class="business-card">
+          <h3>✈️ Travel Business</h3>
+          <textarea data-save="travelTasks" placeholder="Content, bookings, leads, learning..."></textarea><button class="btn section-save" data-section-save="travel" style="margin-top:12px">Save travel section</button>
+        </div>
+        <div class="business-card">
+          <h3>⚡ Utilities Warehouse</h3>
+          <textarea data-save="uwTasks" placeholder="Training, product knowledge, practice..."></textarea><button class="btn section-save" data-section-save="uw" style="margin-top:12px">Save UW section</button>
+        </div>
+        <div class="business-card">
+          <h3>💜 TransformHER</h3>
+          <textarea data-save="appTasks" placeholder="Developer notes, testing, features..."></textarea><button class="btn section-save" data-section-save="app" style="margin-top:12px">Save app section</button>
+        </div>
+        <div class="business-card">
+          <h3>🌱 JG Groundcare</h3>
+          <textarea data-save="jgTasks" placeholder="Accounts, invoices, emails, admin..."></textarea><button class="btn section-save" data-section-save="jg" style="margin-top:12px">Save JG section</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="calls"><div class="grid">
+<div class="card full"><h3>Travel Business Calls</h3><div class="muted">Your upcoming TU calls and events.</div></div>
+<div class="card full"><div id="travelCallsList"></div></div>
+</div></section>
+    <section class="panel" id="training">
+      <div class="grid">
+        <div class="card full">
+          <h3>TransformHER Training Plan</h3>
+          <p class="muted">Your full weekly plan, workouts and StairMaster intervals. Progress saves on this device.</p>
+          <div class="training-progress"><div id="trainingProgressBar"></div></div>
+          <p class="muted" id="trainingProgressText" style="margin-top:8px"></p>
+        </div>
+        <div class="card full">
+          <h3>Weekly training</h3>
+          <div id="trainingWeek"></div>
+          <button class="btn secondary" id="resetTrainingWeek" style="margin-top:12px">Reset training week</button>
+        </div>
+        <div class="card wide">
+          <h3 id="selectedWorkoutTitle">Select a session</h3>
+          <p class="muted" id="selectedWorkoutSubtitle"></p>
+          <div id="selectedWorkoutExercises"></div>
+          <div class="session-toolbar">
+            <button class="btn" id="saveWorkoutSession">Save completed workout</button>
+            <button class="btn secondary" id="clearWorkoutInputs">Clear current inputs</button>
+          </div>
+          <div class="session-status" id="workoutSaveStatus"></div>
+        </div>
+        <div class="card">
+          <h3>StairMaster intervals</h3>
+          <span class="badge">20 minutes</span>
+          <div id="stairIntervals" style="margin-top:10px"></div>
+          <div class="notice">If your hip or upper-quad pain returns, worsens or makes the leg feel unstable, stop and use the bike instead.</div>
+        </div>
+        <div class="card full">
+          <h3>Workout history</h3>
+          <p class="muted">Your saved sessions appear here, newest first.</p>
+          <div id="workoutHistory"></div>
+        </div>
+        <div class="card full">
+          <h3>Training notes</h3>
+          <textarea id="trainingNotes" placeholder="Energy, pain, wins, weights or anything to adjust next time."></textarea>
+          <button class="btn" id="saveTrainingNotes" style="margin-top:10px">Save training notes</button>
+        </div>
+      </div>
+    </section>
+<section class="panel" id="me">
+      <div class="grid">
+        <div class="card">
+          <h3>Movement</h3>
+          <div class="task"><input type="checkbox" data-track="movement1"><label>Complete today’s workout or walk</label></div>
+          <div class="task"><input type="checkbox" data-track="movement2"><label>5-minute mobility</label></div>
+        </div>
+        <div class="card">
+          <h3>Personal time</h3>
+          <div class="task"><input type="checkbox" data-track="personal1"><label>Read or enjoy something just for me</label></div>
+          <div class="task"><input type="checkbox" data-track="personal2"><label>Finish work by 5pm</label></div>
+        </div>
+        <div class="card">
+          <h3>Gratitude</h3>
+          <textarea data-save="gratitude" placeholder="Three things I’m grateful for..."></textarea><button class="btn section-save" data-section-save="gratitude" style="margin-top:12px">Save gratitude</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="review">
+      <div class="grid">
+        <div class="card wide">
+          <h3>Weekly reflection</h3>
+          <textarea data-save="weeklyProud" placeholder="What am I proud of this week?"></textarea>
+          <textarea data-save="weeklyWorked" placeholder="What worked well?" style="margin-top:10px"></textarea>
+          <textarea data-save="weeklyImprove" placeholder="What would make next week feel easier?" style="margin-top:10px"></textarea><button class="btn section-save" data-section-save="weeklyreflection" style="margin-top:12px">Save reflection</button>
+        </div>
+        <div class="card">
+          <h3>Weekly numbers</h3>
+          <div class="metric"><span>Travel income</span><input type="text" data-save="travelIncome" placeholder="£"></div>
+          <div class="metric"><span>UW income</span><input type="text" data-save="uwIncome" placeholder="£"></div>
+          <div class="metric"><span>JG income</span><input type="text" data-save="jgIncome" placeholder="£"></div>
+          <div class="metric"><span>Workouts</span><input type="number" data-save="workoutsDone"></div><button class="btn section-save" data-section-save="weeklynumbers" style="margin-top:12px">Save weekly numbers</button>
+        </div>
+        <div class="card full">
+          <h3>Next week’s one big focus</h3>
+          <input type="text" data-save="nextFocus" placeholder="The single thing that matters most next week">
+          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+            <button class="btn" onclick="saveAll()">Save my week</button>
+            <button class="btn secondary" onclick="resetDaily()">Reset today only</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  <section class="panel" id="progress"><div class="grid">
+<div class="card full"><h3>Weekly Progress</h3><div class="muted">Every saved section appears here for your end-of-week review.</div><div id="weekLabel" style="margin-top:12px;font-weight:800"></div><div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap"><button class="btn secondary" id="prevWeek">← Previous</button><button class="btn secondary" id="nextWeek">Next →</button></div></div>
+<div class="card full"><h3>Week at a glance</h3><div class="business-grid" id="progressSummary"></div></div>
+<div class="card full"><h3>Saved entries</h3><div id="progressEntries"></div></div>
+</div></section></main>
+
+  <div class="footer-note">Your data stays in this browser on this device.</div><div class="save-toast" id="saveToast">Saved ✨</div>
+</div>
+
+<script>
+  const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const themes = {
+    Monday:["✈️ Travel Business","Bookings, follow-ups, learning and content planning"],
+    Tuesday:["⚡ Utilities Warehouse","Learning, product confidence and practice"],
+    Wednesday:["💜 TransformHER App","Testing, feedback, features and development"],
+    Thursday:["🎥 Travel Content","Film, edit, schedule and connect"],
+    Friday:["🌿 CEO Day","Review, organise, celebrate and plan"],
+    Saturday:["🤍 Protected Weekend","Rest, travel, fun and time for you"],
+    Sunday:["🤍 Protected Weekend","Rest, reset and time for you"]
+  };
+  const quotes = [
+    "A calm plan will take you further than a frantic one.",
+    "You are allowed to build slowly and still build something brilliant.",
+    "Consistency can look gentle.",
+    "Your life is not separate from the success you are creating.",
+    "One focused block is enough for today."
+  ];
+
+  const now = new Date();
+  const day = dayNames[now.getDay()];
+  document.getElementById("todayDate").textContent = now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  document.getElementById("greeting").textContent = `${greeting}, Jasmine`;
+  document.getElementById("dayFocus").textContent = themes[day][0];
+  document.getElementById("quote").textContent = `“${quotes[now.getDate()%quotes.length]}”`;
+
+  const weekdayTasks = {
+    Monday:["Part-time job 8am–1pm","Gym + lunch","Travel business focus block","30 mins JG admin","Finish work by 5pm"],
+    Tuesday:["Part-time job 8am–1pm","Training / run + lunch","UW learning block","30 mins JG admin","Finish work by 5pm"],
+    Wednesday:["Part-time job 8am–1pm","Gym + lunch","TransformHER development block","30 mins JG admin","Finish work by 5pm"],
+    Thursday:["Part-time job 8am–1pm","Pilates / training + lunch","Travel content block","30 mins JG admin","Finish work by 5pm"],
+    Friday:["Part-time job 8am–1pm","Training / run + lunch","CEO review and planning","30 mins JG admin","Close the week calmly"],
+    Saturday:["No business work","Enjoy the day","Do something that fills your cup"],
+    Sunday:["No business work","Rest and reset","Prepare gently for Monday"]
+  };
+
+  function dailyKey(name){ return `ceohq-${now.toISOString().slice(0,10)}-${name}`; }
+
+  const tasksEl = document.getElementById("dailyTasks");
+  weekdayTasks[day].forEach((text,i)=>{
+    const wrap=document.createElement("div"); wrap.className="task";
+    const cb=document.createElement("input"); cb.type="checkbox"; cb.dataset.daily=i;
+    cb.checked=localStorage.getItem(dailyKey("task"+i))==="1";
+    const label=document.createElement("label"); label.textContent=text;
+    if(cb.checked) wrap.classList.add("done");
+    cb.addEventListener("change",()=>{localStorage.setItem(dailyKey("task"+i),cb.checked?"1":"0");wrap.classList.toggle("done",cb.checked);updateProgress();});
+    wrap.append(cb,label); tasksEl.appendChild(wrap);
+  });
+
+  document.querySelectorAll("nav button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+      btn.classList.add("active"); document.getElementById(btn.dataset.tab).classList.add("active");
+    });
+  });
+
+  document.querySelectorAll("[data-save]").forEach(el=>{
+    const key="ceohq-"+el.dataset.save;
+    el.value=localStorage.getItem(key)||"";
+    el.addEventListener("input",()=>localStorage.setItem(key,el.value));
+  });
+
+  document.querySelectorAll("[data-track]").forEach(el=>{
+    const key="ceohq-"+el.dataset.track;
+    el.checked=localStorage.getItem(key)==="1";
+    el.addEventListener("change",()=>localStorage.setItem(key,el.checked?"1":"0"));
+  });
+
+  function updateProgress(){
+    const boxes=[...document.querySelectorAll("[data-daily]")];
+    const done=boxes.filter(b=>b.checked).length;
+    const pct=Math.round(done/boxes.length*100);
+    document.getElementById("progressRing").style.setProperty("--progress",pct+"%");
+    document.getElementById("progressText").textContent=pct+"%";
+    document.getElementById("progressCaption").textContent=pct===100?"You’ve done enough for today. ✨":pct>=60?"You’re making lovely progress.":pct>0?"Keep it gentle and focused.":"Start with one small win.";
+  }
+  updateProgress();
+
+  function saveAll(){
+    alert("Everything is saved automatically on this device ✨");
+  }
+  function resetDaily(){
+    document.querySelectorAll("[data-daily]").forEach((cb,i)=>{
+      cb.checked=false; localStorage.removeItem(dailyKey("task"+i)); cb.closest(".task").classList.remove("done");
+    });
+    updateProgress();
+  }
+
+const sectionFields={priorities:["priority1","priority2","priority3"],notes:["quickNotes"],wellbeing:["water","mood","reading"],dailywin:["dailyWin"],travel:["travelTasks"],uw:["uwTasks"],app:["appTasks"],jg:["jgTasks"],gratitude:["gratitude"],weeklyreflection:["weeklyProud","weeklyWorked","weeklyImprove"],weeklynumbers:["travelIncome","uwIncome","jgIncome","workoutsDone"]};
+function getWeekStart(date){const d=new Date(date);const n=d.getDay();d.setDate(d.getDate()-n+(n===0?-6:1));d.setHours(0,0,0,0);return d}
+function weekKey(date){return getWeekStart(date).toISOString().slice(0,10)}
+function getStore(){try{return JSON.parse(localStorage.getItem("ceohq-progress")||"{}")}catch{return {}}}
+function toast(m){const e=document.getElementById("saveToast");e.textContent=m;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1600)}
+function saveSection(sec){const st=getStore(),wk=weekKey(new Date());if(!st[wk])st[wk]=[];const values={};(sectionFields[sec]||[]).forEach(n=>{const e=document.querySelector(`[data-save="${n}"]`);values[n]=e?e.value.trim():""});st[wk].push({id:Date.now(),section:sec,date:new Date().toISOString(),values});localStorage.setItem("ceohq-progress",JSON.stringify(st));toast("Saved to Progress ✨");renderProgress()}
+document.querySelectorAll("[data-section-save]").forEach(b=>b.addEventListener("click",()=>saveSection(b.dataset.sectionSave)));
+let weekOffset=0;
+const labels={priorities:"Top priorities",notes:"Quick notes",wellbeing:"Wellbeing",dailywin:"Today’s win",travel:"Travel business",uw:"Utilities Warehouse",app:"TransformHER app",jg:"JG admin",gratitude:"Gratitude",weeklyreflection:"Weekly reflection",weeklynumbers:"Weekly numbers",travelcall:"Travel call"};
+function renderProgress(){const start=new Date();start.setDate(start.getDate()+weekOffset*7);const ws=getWeekStart(start),we=new Date(ws);we.setDate(we.getDate()+6);const entries=getStore()[weekKey(ws)]||[];document.getElementById("weekLabel").textContent=`${ws.toLocaleDateString("en-GB",{day:"numeric",month:"short"})} – ${we.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}`;const c={};entries.forEach(e=>c[e.section]=(c[e.section]||0)+1);document.getElementById("progressSummary").innerHTML=[["Travel",c.travel||0],["UW",c.uw||0],["TransformHER",c.app||0],["JG Admin",c.jg||0],["Wellbeing",c.wellbeing||0],["Reflections",(c.dailywin||0)+(c.weeklyreflection||0)]].map(x=>`<div class="summary-pill"><strong>${x[1]}</strong>${x[0]} saves</div>`).join("");document.getElementById("progressEntries").innerHTML=entries.length?entries.slice().reverse().map(e=>`<div class="progress-entry"><div class="meta">${new Date(e.date).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div><h3 style="font-size:1.05rem;margin-bottom:8px">${labels[e.section]||e.section}</h3>${Object.entries(e.values).filter(x=>x[1]!=="").map(x=>`<div><strong>${x[0].replace(/([A-Z])/g," $1")}:</strong> ${x[1]}</div>`).join("")||"<div class='muted'>Saved with no text entered.</div>"}</div>`).join(""):"<div class='muted'>Nothing saved for this week yet.</div>"}
+document.getElementById("prevWeek").addEventListener("click",()=>{weekOffset--;renderProgress()});document.getElementById("nextWeek").addEventListener("click",()=>{weekOffset++;renderProgress()});renderProgress();
+
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js").catch(console.error);
+    });
+  }
+
+const travelEvents=[{"uid": "evt_h6qy6wfnwvlu", "title": "Amy Beckett & Claire Hill Collaboration Rep Training", "start": "2026-07-29T21:00:00", "location": "https://us06web.zoom.us/j/85199708566?pwd=lacyAQSwIfMU9tbFpkNTMc5WTYZpJx.1"}, {"uid": "evt_600nmj015l5j", "title": "Travel Information Call", "start": "2026-07-30T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_0nc6usn1n410", "title": "TU Coworking session", "start": "2026-08-03T21:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_mpxu762aq2pe", "title": "Donald Bradley (PlanNet Marketing Founder & CEO) joining TU Community Call", "start": "2026-08-05T20:30:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_0vswgfqvhiav", "title": "Travel Information Call", "start": "2026-08-06T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_6caqhqnejnnw", "title": "Debbie Neal - guest training for TU Community", "start": "2026-08-10T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_9cmospaidutf", "title": "Monthly Mindset Call with Josephine", "start": "2026-08-12T20:30:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_oybq6jw3e0hy", "title": "Travel Information Call", "start": "2026-08-13T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_5dz9rmpn86z7", "title": "Travel Information Call", "start": "2026-08-20T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_8b2957ngzq2r", "title": "Travel Information Call", "start": "2026-08-27T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_lnrzds75nfrh", "title": "Monthly Mindset Call with Josephine", "start": "2026-09-14T20:30:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_1w8vpwdf6rrg", "title": "Monthly Mindset Call with Josephine", "start": "2026-10-12T20:30:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}];
+function callKey(uid,field){return "ceohq-call-"+uid+"-"+field}
+function safeText(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
+function renderTravelCalls(){
+ const list=document.getElementById("travelCallsList");
+ if(!list) return;
+ const now=new Date();
+ const filtered=travelEvents.filter(e=>new Date(e.start)>=now);
+ list.innerHTML=filtered.length?filtered.map(e=>{
+   const d=new Date(e.start);
+   const attended=localStorage.getItem(callKey(e.uid,"attended"))==="1";
+   const notes=localStorage.getItem(callKey(e.uid,"notes"))||"";
+   const actions=localStorage.getItem(callKey(e.uid,"actions"))||"";
+   return `<div class="call-card">
+     <div class="call-top"><div>
+       <div class="call-date">${d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})} · ${d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</div>
+       <div class="call-title">${safeText(e.title)}</div>
+     </div><button class="tiny-btn ${attended?"attended":""}" data-attend="${safeText(e.uid)}">${attended?"✓ Attended":"Mark attended"}</button></div>
+     <div class="call-actions">${e.location?`<a class="tiny-btn" href="${safeText(e.location)}" target="_blank" rel="noopener">Join Zoom</a>`:""}<button class="tiny-btn" data-savecall="${safeText(e.uid)}">Save to progress</button></div>
+     <div class="call-notes"><textarea data-notes="${safeText(e.uid)}" placeholder="Key takeaways...">${safeText(notes)}</textarea><textarea data-actions="${safeText(e.uid)}" placeholder="Actions to take...">${safeText(actions)}</textarea></div>
+   </div>`;
+ }).join(""):'<div class="muted">No upcoming calls are currently listed.</div>';
+ document.querySelectorAll("[data-attend]").forEach(b=>b.onclick=()=>{const u=b.dataset.attend;localStorage.setItem(callKey(u,"attended"),localStorage.getItem(callKey(u,"attended"))==="1"?"0":"1");renderTravelCalls()});
+ document.querySelectorAll("[data-notes]").forEach(e=>e.oninput=()=>localStorage.setItem(callKey(e.dataset.notes,"notes"),e.value));
+ document.querySelectorAll("[data-actions]").forEach(e=>e.oninput=()=>localStorage.setItem(callKey(e.dataset.actions,"actions"),e.value));
+ document.querySelectorAll("[data-savecall]").forEach(b=>b.onclick=()=>{
+   const u=b.dataset.savecall,ev=travelEvents.find(x=>x.uid===u),st=getStore(),wk=weekKey(new Date());
+   if(!st[wk])st[wk]=[];
+   st[wk].push({id:Date.now(),section:"travelcall",date:new Date().toISOString(),values:{call:ev.title,callDate:new Date(ev.start).toLocaleString("en-GB"),attended:localStorage.getItem(callKey(u,"attended"))==="1"?"Yes":"No",notes:localStorage.getItem(callKey(u,"notes"))||"",actions:localStorage.getItem(callKey(u,"actions"))||""}});
+   localStorage.setItem("ceohq-progress",JSON.stringify(st));toast("Call saved to Progress ✨");renderProgress();
+ });
+}
+renderTravelCalls();
+
+
+const trainingPlan={"Monday": {"title": "Full Body A + StairMaster", "subtitle": "Strength and cardio", "items": [["Romanian deadlift", "3 × 8–10"], ["Lat pulldown", "3 × 10"], ["Hip thrust", "3 × 10"], ["Incline dumbbell press", "3 × 10"], ["Walking lunges", "3 × 10 each leg"], ["Seated cable row", "3 × 10"], ["Face pulls", "3 × 12–15"], ["Pallof press", "3 × 10 each side"], ["StairMaster", "20-minute intervals"]]}, "Tuesday": {"title": "Run", "subtitle": "Follow your current running plan", "items": [["Run session", "Complete today’s planned run"], ["Cool-down", "Gentle walk and mobility"]]}, "Wednesday": {"title": "Full Body B + Bike", "subtitle": "Strength and steady cardio", "items": [["Leg press", "3 × 10"], ["Dumbbell shoulder press", "3 × 10"], ["Bulgarian split squat", "3 × 8 each leg"], ["Chest press", "3 × 10"], ["Chest-supported row", "3 × 10"], ["Hamstring curl", "3 × 12"], ["Cable lateral raise", "3 × 12–15"], ["Dead bugs or hanging knee raises", "3 × 12"], ["Bike", "10–15 minutes steady"]]}, "Thursday": {"title": "Pilates & Mobility", "subtitle": "Controlled movement and recovery", "items": [["Cat-cow", "8 slow reps"], ["90/90 hip rotations", "8 each side"], ["Glute bridge", "3 × 12"], ["Dead bug", "3 × 8 each side"], ["Bird dog", "3 × 8 each side"], ["Side-lying leg lift", "2 × 12 each side"], ["Side plank", "2 × 20–30 seconds each side"], ["Hip-flexor stretch", "45 seconds each side"], ["Hamstring stretch", "45 seconds each side"], ["Child’s pose breathing", "1–2 minutes"]]}, "Friday": {"title": "Run", "subtitle": "Follow your current running plan", "items": [["Run session", "Complete today’s planned run"], ["Cool-down", "Gentle walk and mobility"]]}, "Saturday": {"title": "Home Workout", "subtitle": "Choose Home Workout 1 or 2", "items": [["Goblet squat", "3 × 10–12"], ["Dumbbell Romanian deadlift", "3 × 10–12"], ["Incline or floor press-up", "3 × 8–12"], ["Single-arm dumbbell row", "3 × 10 each side"], ["Kettlebell swing", "3 × 15"], ["Reverse lunge", "2 × 8 each side"], ["Plank", "3 × 30–45 seconds"]]}, "Sunday": {"title": "Rest or Gentle Walk", "subtitle": "Recovery day", "items": [["Gentle movement", "Optional walk and five-minute mobility"]]}};
+const stairPlan=[["2:00", "Warm-up", "3/10"], ["1:00", "Build", "5/10"], ["1:00", "Push", "7/10"], ["1:00", "Recover", "3/10"], ["1:00", "Push", "7/10"], ["1:00", "Recover", "3/10"], ["1:00", "Push", "8/10"], ["1:00", "Recover", "3/10"], ["1:00", "Push", "8/10"], ["1:00", "Recover", "3/10"], ["1:00", "Push", "8/10"], ["1:00", "Recover", "3/10"], ["2:00", "Steady climb", "6/10"], ["1:00", "Final push", "8/10"], ["3:00", "Cool-down", "2–3/10"]];
+const trainingDays=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+function trainingKey(day){return "ceohq-training-"+day}
+function renderTrainingWeek(){
+ const wrap=document.getElementById("trainingWeek"); if(!wrap)return;
+ wrap.innerHTML="";
+ trainingDays.forEach(day=>{
+   const plan=trainingPlan[day], checked=localStorage.getItem(trainingKey(day))==="1";
+   const row=document.createElement("div"); row.className="training-day";
+   row.innerHTML=`<input type="checkbox" ${checked?"checked":""} aria-label="Complete ${day}">
+     <div class="training-day-copy" role="button" tabindex="0"><strong>${day}</strong><span>${plan.title}</span></div>
+     <button type="button" class="open-workout-btn" aria-label="Open ${day} workout">›</button>`;
+   const checkbox=row.querySelector("input");
+   const copy=row.querySelector(".training-day-copy");
+   const openBtn=row.querySelector(".open-workout-btn");
+   checkbox.addEventListener("click",e=>{
+     e.stopPropagation();
+     localStorage.setItem(trainingKey(day),e.target.checked?"1":"0");
+     updateTrainingProgress();
+   });
+   const openWorkout=(e)=>{
+     if(e)e.stopPropagation();
+     showWorkout(day);
+     const target=document.getElementById("selectedWorkoutTitle");
+     if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
+   };
+   copy.addEventListener("click",openWorkout);
+   copy.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openWorkout(e);}});
+   openBtn.addEventListener("click",openWorkout);
+   row.addEventListener("click",e=>{
+     if(e.target===checkbox||e.target===openBtn||copy.contains(e.target))return;
+     openWorkout(e);
+   });
+   wrap.appendChild(row);
+ });
+ updateTrainingProgress();
+}
+function updateTrainingProgress(){
+ const done=trainingDays.filter(d=>localStorage.getItem(trainingKey(d))==="1").length;
+ const bar=document.getElementById("trainingProgressBar"), text=document.getElementById("trainingProgressText");
+ if(bar)bar.style.width=(done/trainingDays.length*100)+"%";
+ if(text)text.textContent=`${done} of ${trainingDays.length} days completed`;
+}
+
+let selectedTrainingDay = new Date().toLocaleDateString("en-GB",{weekday:"long"});
+
+function sessionStore(){
+  try{return JSON.parse(localStorage.getItem("ceohq-workout-history")||"{}")}catch(e){return {}}
+}
+function saveSessionStore(store){ localStorage.setItem("ceohq-workout-history",JSON.stringify(store)); }
+function lastSessionFor(day){
+  const sessions=sessionStore()[day]||[];
+  return sessions.length?sessions[sessions.length-1]:null;
+}
+function parseRepRange(text){
+  const m=String(text).match(/(\d+)\s*[–-]\s*(\d+)/);
+  if(m)return {min:Number(m[1]),max:Number(m[2])};
+  const single=String(text).match(/(\d+)/);
+  return single?{min:Number(single[1]),max:Number(single[1])}:null;
+}
+function targetSets(text){
+  const m=String(text).match(/^(\d+)\s*[×x]/);
+  return m?Number(m[1]):3;
+}
+function progressionMessage(item,lastExercise){
+  if(!lastExercise)return "First logged session — choose a controlled weight and leave 1–2 good reps in reserve.";
+  const range=parseRepRange(item[1]);
+  const valid=(lastExercise.sets||[]).filter(s=>Number(s.reps)>0);
+  if(!valid.length)return "Use your previous session as a guide and aim for one small improvement.";
+  if(!range)return "Repeat this result with cleaner form, a little more time, distance or control.";
+  const allAtTop=valid.every(s=>Number(s.reps)>=range.max);
+  if(allAtTop)return "You reached the top of the rep range last time — try a small weight increase while staying in the target range.";
+  const allAtMin=valid.every(s=>Number(s.reps)>=range.min);
+  if(allAtMin)return "Keep the same weight and aim to add 1 rep to one or more sets.";
+  return "Keep the same weight and work towards reaching the bottom of the rep range on every set.";
+}
+function workoutRows(day,target,inputs=true){
+  const plan=trainingPlan[day], wrap=document.getElementById(target); if(!wrap)return;
+  const last=lastSessionFor(day);
+  wrap.innerHTML=plan.items.map((x,i)=>{
+    const prior=last&&last.exercises?last.exercises[i]:null;
+    const sets=targetSets(x[1]);
+    const setInputs=inputs?Array.from({length:sets},(_,s)=>{
+      const draftKey=`ceohq-draft-${day}-${i}-${s}`;
+      let draft={}; try{draft=JSON.parse(localStorage.getItem(draftKey)||"{}")}catch(e){}
+      return `<div class="set-grid"><div class="set-label">Set ${s+1}</div>
+      <input inputmode="decimal" data-weight="${day}|${i}|${s}" placeholder="Weight" value="${draft.weight||""}">
+      <input inputmode="numeric" data-reps="${day}|${i}|${s}" placeholder="Reps" value="${draft.reps||""}"></div>`;
+    }).join(""):"";
+    const lastText=prior&&prior.sets&&prior.sets.length
+      ? prior.sets.map((s,idx)=>`Set ${idx+1}: ${s.weight||"—"} kg × ${s.reps||"—"}`).join(" · ")
+      : "No previous result saved.";
+    return `<div class="${target==="todayWorkoutExercises"?"today-exercise":"exercise-row"}">
+      <div class="exercise-top"><strong>${x[0]}</strong><small>${x[1]}</small></div>
+      ${inputs?`<div class="exercise-history"><strong>Last time:</strong> ${lastText}</div>
+      <div class="progression-tip"><strong>Next target:</strong> ${progressionMessage(x,prior)}</div>${setInputs}`:""}
+    </div>`;
+  }).join("");
+  if(inputs){
+    wrap.querySelectorAll("[data-weight],[data-reps]").forEach(el=>{
+      el.addEventListener("input",()=>{
+        const parts=(el.dataset.weight||el.dataset.reps).split("|");
+        const [d,i,s]=parts, key=`ceohq-draft-${d}-${i}-${s}`;
+        let draft={}; try{draft=JSON.parse(localStorage.getItem(key)||"{}")}catch(e){}
+        if(el.dataset.weight!==undefined)draft.weight=el.value;
+        if(el.dataset.reps!==undefined)draft.reps=el.value;
+        localStorage.setItem(key,JSON.stringify(draft));
+      });
+    });
+  }
+}
+function showWorkout(day){
+  selectedTrainingDay=day;
+  const p=trainingPlan[day];
+  document.getElementById("selectedWorkoutTitle").textContent=day+" — "+p.title;
+  document.getElementById("selectedWorkoutSubtitle").textContent=p.subtitle;
+  workoutRows(day,"selectedWorkoutExercises",true);
+  renderWorkoutHistory(day);
+  document.getElementById("workoutSaveStatus").textContent="";
+}
+function collectWorkoutSession(day){
+  const plan=trainingPlan[day];
+  return {id:Date.now(),date:new Date().toISOString(),title:plan.title,
+    exercises:plan.items.map((item,i)=>{
+      const sets=targetSets(item[1]);
+      return {name:item[0],prescription:item[1],sets:Array.from({length:sets},(_,s)=>{
+        const key=`ceohq-draft-${day}-${i}-${s}`;
+        let draft={}; try{draft=JSON.parse(localStorage.getItem(key)||"{}")}catch(e){}
+        return {weight:draft.weight||"",reps:draft.reps||""};
+      })};
+    })
+  };
+}
+function clearDrafts(day){
+  const plan=trainingPlan[day];
+  plan.items.forEach((item,i)=>{for(let s=0;s<targetSets(item[1]);s++)localStorage.removeItem(`ceohq-draft-${day}-${i}-${s}`);});
+}
+function saveWorkoutSession(){
+  const day=selectedTrainingDay, session=collectWorkoutSession(day);
+  const hasEntries=session.exercises.some(ex=>ex.sets.some(s=>s.weight!==""||s.reps!==""));
+  if(!hasEntries){document.getElementById("workoutSaveStatus").textContent="Add at least one set before saving.";return;}
+  const store=sessionStore(); if(!store[day])store[day]=[]; store[day].push(session); saveSessionStore(store);
+  localStorage.setItem(trainingKey(day),"1"); clearDrafts(day);
+  document.getElementById("workoutSaveStatus").textContent="Workout saved ✓ Your results will show as “last time” next session.";
+  renderTrainingWeek(); showWorkout(day);
+}
+function clearWorkoutInputs(){
+  if(confirm("Clear the current unsaved weights and reps?")){clearDrafts(selectedTrainingDay);showWorkout(selectedTrainingDay);}
+}
+function renderWorkoutHistory(day=selectedTrainingDay){
+  const wrap=document.getElementById("workoutHistory"); if(!wrap)return;
+  const sessions=(sessionStore()[day]||[]).slice().reverse();
+  if(!sessions.length){wrap.innerHTML=`<div class="muted">No saved ${day} sessions yet.</div>`;return;}
+  wrap.innerHTML=sessions.map(session=>{
+    const d=new Date(session.date);
+    const exercises=session.exercises.map(ex=>{
+      const sets=ex.sets.filter(s=>s.weight!==""||s.reps!=="");
+      if(!sets.length)return "";
+      return `<div class="history-exercise"><strong>${ex.name}</strong>${sets.map((s,i)=>`Set ${i+1}: ${s.weight||"—"} kg × ${s.reps||"—"}`).join(" · ")}</div>`;
+    }).join("");
+    return `<details class="history-session"><summary>${d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"})} — ${session.title}</summary>${exercises}</details>`;
+  }).join("");
+}
+function renderTodayWorkout(){
+ const day=new Date().toLocaleDateString("en-GB",{weekday:"long"}), p=trainingPlan[day];
+ if(!p)return;
+ document.getElementById("todayWorkoutTitle").textContent=day+" — "+p.title;
+ document.getElementById("todayWorkoutSubtitle").textContent=p.subtitle;
+ workoutRows(day,"todayWorkoutExercises",false);
+ const btn=document.getElementById("completeTodayWorkout");
+ const refresh=()=>{const done=localStorage.getItem(trainingKey(day))==="1";btn.textContent=done?"✓ Workout completed":"Mark workout complete";btn.classList.toggle("secondary",done)};
+ btn.onclick=()=>{localStorage.setItem(trainingKey(day),localStorage.getItem(trainingKey(day))==="1"?"0":"1");refresh();renderTrainingWeek()};
+ refresh();
+}
+function renderStairs(){
+ const wrap=document.getElementById("stairIntervals"); if(!wrap)return;
+ wrap.innerHTML=stairPlan.map(x=>`<div class="interval-row"><strong>${x[0]}</strong><span>${x[1]}</span><small>${x[2]}</small></div>`).join("");
+}
+document.getElementById("saveWorkoutSession").addEventListener("click",saveWorkoutSession);
+document.getElementById("clearWorkoutInputs").addEventListener("click",clearWorkoutInputs);
+document.getElementById("resetTrainingWeek").addEventListener("click",()=>{if(confirm("Reset this week’s training ticks?")){trainingDays.forEach(d=>localStorage.removeItem(trainingKey(d)));renderTrainingWeek();renderTodayWorkout()}});
+document.getElementById("saveTrainingNotes").addEventListener("click",()=>{localStorage.setItem("ceohq-training-notes",document.getElementById("trainingNotes").value);toast("Training notes saved ✨")});
+document.getElementById("trainingNotes").value=localStorage.getItem("ceohq-training-notes")||"";
+renderTrainingWeek(); renderTodayWorkout(); renderStairs(); showWorkout(new Date().toLocaleDateString("en-GB",{weekday:"long"})); renderWorkoutHistory();
+
+</script>
+</body>
+</html>
