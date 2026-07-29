@@ -6,9 +6,10 @@
   <meta name="theme-color" content="#8B7667" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="CEO HQ" />
+  <meta name="apple-mobile-web-app-title" content="TransformHER CEO" />
 <link rel="icon" href="icon-192.svg" type="image/svg+xml" />
-  <title>Jasmine's CEO HQ</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>TransformHER CEO</title>
   <style>
     :root{
       --ivory:#FAF7F3;
@@ -116,7 +117,7 @@
     .training-day input{flex:0 0 auto}
     .training-day-copy{flex:1}
     .training-day-copy strong{display:block;color:var(--taupe-dark)}
-    .training-day-copy span{font-size:.9rem;color:var(--muted)}.open-workout-btn{border:0;background:transparent;color:var(--taupe-dark);padding:12px 8px;font-size:1.2rem;cursor:pointer;touch-action:manipulation}
+    .training-day-copy span{font-size:.9rem;color:var(--muted)}.day-select{border:1px solid var(--line);background:var(--paper);color:var(--taupe-dark);padding:8px 10px;border-radius:10px;font-weight:700;font-size:.86rem}.schedule-note{margin-top:8px;font-size:.8rem;color:var(--muted)}.open-workout-btn{border:0;background:transparent;color:var(--taupe-dark);padding:12px 8px;font-size:1.2rem;cursor:pointer;touch-action:manipulation}
     .exercise-row{padding:12px 0;border-bottom:1px dashed var(--line)}
     .exercise-row:last-child{border-bottom:0}
     .exercise-top{display:flex;justify-content:space-between;gap:12px}
@@ -128,9 +129,9 @@
 
     .exercise-history{margin-top:10px;padding:10px 12px;background:#faf7f3;border-radius:12px;font-size:.88rem;color:var(--muted)}
     .exercise-history strong{color:var(--taupe-dark)}
-    .set-grid{display:grid;grid-template-columns:54px 1fr 1fr;gap:8px;align-items:center;margin-top:8px}
+    .set-grid{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center;margin-top:10px;width:100%;max-width:100%}
     .set-grid .set-label{font-size:.84rem;font-weight:800;color:var(--muted)}
-    .set-grid input{margin-top:0;text-align:center}
+    .set-grid input{margin-top:0;text-align:center;width:100%;min-width:0;max-width:100%;padding:10px 8px;font-size:.92rem}.last-set-line{grid-column:2/4;font-size:.78rem;color:var(--muted);margin-top:-3px;padding-left:2px}.last-set-line strong{color:var(--taupe-dark)}.set-column-labels{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:10px;font-size:.76rem;font-weight:800;color:var(--muted);text-align:center;width:100%;max-width:100%}.set-column-labels span:first-child{text-align:left}
     .progression-tip{margin-top:8px;padding:9px 11px;border-radius:11px;background:#f2eee9;font-size:.85rem;line-height:1.4}
     .session-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .history-session{padding:14px 0;border-bottom:1px dashed var(--line)}
@@ -139,6 +140,13 @@
     .history-exercise{margin-top:9px;font-size:.9rem}
     .history-exercise strong{display:block}
     .session-status{margin-top:10px;font-weight:800;color:var(--sage)}#selectedWorkoutTitle{scroll-margin-top:110px}
+
+    .today-workout-card{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    .today-workout-card-top{display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .today-workout-card h3{margin:4px 0 6px}
+    .today-workout-label{font-size:.76rem;font-weight:800;letter-spacing:.08em}
+    .today-workout-arrow{font-size:2rem;line-height:1;color:var(--taupe-dark)}
+    #openTodayWorkout{margin-top:14px;width:100%}
 @media(max-width:850px){
       .hero{grid-template-columns:1fr}
       .card,.card.wide{grid-column:1/-1}
@@ -147,14 +155,76 @@
       .business-grid{grid-template-columns:1fr}
       header{align-items:flex-start}
     }
-  </style>
+  
+    @media(max-width:560px){
+      .set-grid,.set-column-labels{
+        grid-template-columns:38px minmax(0,1fr) minmax(0,1fr);
+        gap:6px;
+      }
+      .set-grid input{
+        padding:9px 6px;
+        font-size:.85rem;
+        border-radius:10px;
+      }
+      .set-grid .set-label{
+        font-size:.76rem;
+      }
+      .last-set-line{
+        grid-column:1/4;
+        padding-left:0;
+        font-size:.74rem;
+        line-height:1.35;
+      }
+      .exercise-row{
+        overflow:hidden;
+      }
+    }
+
+
+    .focus-card{background:linear-gradient(135deg,var(--paper),rgba(255,255,255,.72))}
+    .focus-list{display:grid;gap:9px;margin-top:14px}
+    .focus-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.55)}
+    .focus-icon{width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:var(--rose-light);flex:0 0 auto}
+    .priority-progress-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 12px}
+    .priority-count{font-size:.82rem;font-weight:800;color:var(--taupe-dark)}
+    .priority-track{height:7px;flex:1;background:var(--line);border-radius:999px;overflow:hidden}
+    .priority-fill{height:100%;width:0;background:var(--taupe);border-radius:999px;transition:width .25s ease}
+    .priority-row{display:grid;grid-template-columns:26px minmax(0,1fr);gap:8px;align-items:center;margin-top:9px}
+    .priority-row input[type="checkbox"]{width:21px;height:21px;margin:0;accent-color:var(--taupe);cursor:pointer}
+    .priority-row input[type="text"]{margin:0;min-width:0}
+    .priority-row.complete input[type="text"]{text-decoration:line-through;opacity:.58}
+    .priority-celebration{display:none;margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--rose-light);font-size:.88rem;font-weight:700}
+    .priority-celebration.show{display:block}
+    .daily-reset-wrap{display:flex;justify-content:flex-end;margin-top:16px}
+    .danger-soft{background:transparent;border:1px solid var(--line);color:var(--taupe-dark)}
+
+
+    .workout-view{
+      display:none;position:fixed;inset:0;z-index:100;background:linear-gradient(180deg,#FAF7F3 0%,#F7F1EC 100%);
+      overflow-y:auto;padding:0 16px 40px;
+    }
+    .workout-view.open{display:block}
+    .workout-view-inner{max-width:850px;margin:0 auto}
+    .workout-view-header{
+      position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:12px;
+      padding:14px 0;background:linear-gradient(180deg,#FAF7F3 82%,rgba(250,247,243,0));
+    }
+    .workout-back{
+      border:1px solid var(--line);background:var(--paper);color:var(--taupe-dark);
+      width:44px;height:44px;border-radius:14px;font-size:1.35rem;font-weight:800;cursor:pointer;
+    }
+    .workout-view-heading{font-family:Georgia,serif;font-size:1.25rem;color:var(--taupe-dark);font-weight:800}
+    .workout-view .card{width:100%;margin-bottom:16px}
+    body.workout-open{overflow:hidden}
+
+</style>
 </head>
 <body>
 <div class="app">
   <header>
     <div>
       <div class="eyebrow">Your calm business & life dashboard</div>
-      <h1>CEO HQ</h1>
+      <h1>TransformHER CEO</h1>
       <div class="date" id="todayDate"></div>
     </div>
     <div class="badge">Weekends protected ✨</div>
@@ -186,23 +256,57 @@
     <section class="panel active" id="today">
       <div class="grid">
 
-        <div class="card wide" id="todayWorkoutCard">
-          <h3 id="todayWorkoutTitle">Today’s training</h3>
-          <p class="muted" id="todayWorkoutSubtitle"></p>
-          <div id="todayWorkoutExercises"></div>
-          <button class="btn" id="completeTodayWorkout" style="margin-top:12px">Mark workout complete</button>
+        
+        
+        <div class="card wide focus-card">
+          <div class="muted today-workout-label">TODAY’S FOCUS</div>
+          <h3 id="focusGreeting">Keep today simple</h3>
+          <div class="focus-list">
+            <div class="focus-item"><span class="focus-icon">💪</span><span id="focusWorkout">Today’s workout</span></div>
+            <div class="focus-item"><span class="focus-icon">🎯</span><span id="focusPriority">Choose your first priority</span></div>
+            <div class="focus-item"><span class="focus-icon">🚶</span><span>Move gently and aim for your daily steps</span></div>
+            <div class="focus-item"><span class="focus-icon">💧</span><span id="focusWater">Log your water as you go</span></div>
+          </div>
         </div>
-        <div class="card wide">
+
+        <div class="card wide today-workout-card" id="todayWorkoutCard" role="button" tabindex="0">
+          <div class="today-workout-card-top">
+            <div>
+              <div class="muted today-workout-label">TODAY’S WORKOUT</div>
+              <h3 id="todayWorkoutTitle">Today’s training</h3>
+              <p class="muted" id="todayWorkoutSubtitle"></p>
+            </div>
+            <span class="today-workout-arrow">›</span>
+          </div>
+          <button class="btn" id="openTodayWorkout">Open workout</button>
+        </div>
+<div class="card wide">
           <h3>Today’s checklist</h3>
           <div id="dailyTasks"></div>
         </div>
-        <div class="card">
+        
+        <div class="card" id="prioritiesCard">
           <h3>Top 3 priorities</h3>
-          <input type="text" data-save="priority1" placeholder="Priority one">
-          <input type="text" data-save="priority2" placeholder="Priority two" style="margin-top:9px">
-          <input type="text" data-save="priority3" placeholder="Priority three" style="margin-top:9px"><button class="btn section-save" data-section-save="priorities" style="margin-top:12px">Save priorities</button>
+          <div class="priority-progress-row">
+            <div class="priority-track"><div class="priority-fill" id="priorityFill"></div></div>
+            <span class="priority-count" id="priorityCount">0/3 complete</span>
+          </div>
+          <div class="priority-row">
+            <input type="checkbox" data-priority-check="1" aria-label="Complete priority one">
+            <input type="text" data-save="priority1" placeholder="Priority one">
+          </div>
+          <div class="priority-row">
+            <input type="checkbox" data-priority-check="2" aria-label="Complete priority two">
+            <input type="text" data-save="priority2" placeholder="Priority two">
+          </div>
+          <div class="priority-row">
+            <input type="checkbox" data-priority-check="3" aria-label="Complete priority three">
+            <input type="text" data-save="priority3" placeholder="Priority three">
+          </div>
+          <div class="priority-celebration" id="priorityCelebration">Amazing — your top priorities are complete for today ✨</div>
+          <button class="btn section-save" data-section-save="priorities" style="margin-top:12px">Save priorities</button>
         </div>
-        <div class="card">
+<div class="card">
           <h3>Quick notes</h3>
           <textarea data-save="quickNotes" placeholder="Ideas, reminders, anything on your mind..."></textarea><button class="btn section-save" data-section-save="notes" style="margin-top:12px">Save notes</button>
         </div>
@@ -216,6 +320,9 @@
           <h3>Today’s win</h3>
           <textarea data-save="dailyWin" placeholder="What are you proud of today?"></textarea><button class="btn section-save" data-section-save="dailywin" style="margin-top:12px">Save today’s win</button>
         </div>
+      </div>
+      <div class="daily-reset-wrap">
+        <button class="btn danger-soft" id="resetTodayButton">Reset today</button>
       </div>
     </section>
 
@@ -296,26 +403,11 @@
           <div id="trainingWeek"></div>
           <button class="btn secondary" id="resetTrainingWeek" style="margin-top:12px">Reset training week</button>
         </div>
-        <div class="card wide">
-          <h3 id="selectedWorkoutTitle">Select a session</h3>
-          <p class="muted" id="selectedWorkoutSubtitle"></p>
-          <div id="selectedWorkoutExercises"></div>
-          <div class="session-toolbar">
-            <button class="btn" id="saveWorkoutSession">Save completed workout</button>
-            <button class="btn secondary" id="clearWorkoutInputs">Clear current inputs</button>
-          </div>
-          <div class="session-status" id="workoutSaveStatus"></div>
-        </div>
         <div class="card">
           <h3>StairMaster intervals</h3>
           <span class="badge">20 minutes</span>
           <div id="stairIntervals" style="margin-top:10px"></div>
           <div class="notice">If your hip or upper-quad pain returns, worsens or makes the leg feel unstable, stop and use the bike instead.</div>
-        </div>
-        <div class="card full">
-          <h3>Workout history</h3>
-          <p class="muted">Your saved sessions appear here, newest first.</p>
-          <div id="workoutHistory"></div>
         </div>
         <div class="card full">
           <h3>Training notes</h3>
@@ -374,6 +466,31 @@
 <div class="card full"><h3>Saved entries</h3><div id="progressEntries"></div></div>
 </div></section></main>
 
+<section class="workout-view" id="workoutView" aria-hidden="true">
+  <div class="workout-view-inner">
+    <div class="workout-view-header">
+      <button class="workout-back" id="closeWorkoutView" aria-label="Back to Training">←</button>
+      <div class="workout-view-heading">Workout session</div>
+    </div>
+    <div class="card full">
+      <h3 id="selectedWorkoutTitle">Select a session</h3>
+      <p class="muted" id="selectedWorkoutSubtitle"></p>
+      <div id="selectedWorkoutExercises"></div>
+      <div class="session-toolbar">
+        <button class="btn" id="saveWorkoutSession">Save completed workout</button>
+        <button class="btn secondary" id="clearWorkoutInputs">Clear current inputs</button>
+      </div>
+      <div class="session-status" id="workoutSaveStatus"></div>
+    </div>
+    <div class="card full">
+      <h3>Workout history</h3>
+      <p class="muted">Your saved sessions appear here, newest first.</p>
+      <div id="workoutHistory"></div>
+    </div>
+  </div>
+</section>
+
+
   <div class="footer-note">Your data stays in this browser on this device.</div><div class="save-toast" id="saveToast">Saved ✨</div>
 </div>
 
@@ -382,40 +499,90 @@
   const themes = {
     Monday:["✈️ Travel Business","Bookings, follow-ups, learning and content planning"],
     Tuesday:["⚡ Utilities Warehouse","Learning, product confidence and practice"],
-    Wednesday:["💜 TransformHER App","Testing, feedback, features and development"],
+    Wednesday:["💜 TransformHER CEO","Testing, feedback, features and development"],
     Thursday:["🎥 Travel Content","Film, edit, schedule and connect"],
     Friday:["🌿 CEO Day","Review, organise, celebrate and plan"],
     Saturday:["🤍 Protected Weekend","Rest, travel, fun and time for you"],
     Sunday:["🤍 Protected Weekend","Rest, reset and time for you"]
   };
-  const quotes = [
-    "A calm plan will take you further than a frantic one.",
-    "You are allowed to build slowly and still build something brilliant.",
-    "Consistency can look gentle.",
-    "Your life is not separate from the success you are creating.",
-    "One focused block is enough for today."
-  ];
+  const welcomeMessages = {
+    morning:[
+      "Ready to lead today?",
+      "What are we building today?",
+      "Time to move the needle.",
+      "Build with intention today.",
+      "One focused day at a time.",
+      "Protect your energy. Prioritise your goals.",
+      "Your CEO dashboard is ready.",
+      "Small actions. Big vision.",
+      "Today’s decisions shape tomorrow’s freedom.",
+      "Lead yourself well today."
+    ],
+    afternoon:[
+      "Keep the momentum going.",
+      "What’s the next priority?",
+      "Progress beats perfection.",
+      "One more step forward.",
+      "Keep building.",
+      "Small wins still count.",
+      "Keep moving the needle.",
+      "Every action compounds."
+    ],
+    evening:[
+      "Reflect. Reset. Recharge.",
+      "Celebrate today’s wins.",
+      "You’re one step closer.",
+      "Recovery is productive too.",
+      "Close the chapter well.",
+      "Great leaders know when to rest.",
+      "Tomorrow starts with tonight.",
+      "Be proud of today’s progress."
+    ]
+  };
 
   const now = new Date();
   const day = dayNames[now.getDay()];
   document.getElementById("todayDate").textContent = now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   const hour = now.getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-  document.getElementById("greeting").textContent = `${greeting}, Jasmine`;
+  const greetingText = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const timeGroup = hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening";
+
+  function dateSeed(date=new Date()){
+    return Number(`${date.getFullYear()}${String(date.getMonth()+1).padStart(2,"0")}${String(date.getDate()).padStart(2,"0")}`);
+  }
+
+  function getDailyWelcome(){
+    if(day==="Monday") return "Fresh week. Lead it with intention.";
+    if(day==="Friday") return "Finish the week strong — then switch off.";
+    if(day==="Sunday") return "Recovery is part of the plan.";
+    const messages=welcomeMessages[timeGroup];
+    return messages[dateSeed(now)%messages.length];
+  }
+
+  function renderWelcome(message=getDailyWelcome()){
+    const name = dateSeed(now)%4===0 ? "CEO" : "Jasmine";
+    document.getElementById("greeting").textContent = `${greetingText}, ${name}`;
+    document.getElementById("quote").textContent = message;
+  }
+
+  renderWelcome();
   document.getElementById("dayFocus").textContent = themes[day][0];
-  document.getElementById("quote").textContent = `“${quotes[now.getDate()%quotes.length]}”`;
 
   const weekdayTasks = {
     Monday:["Part-time job 8am–1pm","Gym + lunch","Travel business focus block","30 mins JG admin","Finish work by 5pm"],
     Tuesday:["Part-time job 8am–1pm","Training / run + lunch","UW learning block","30 mins JG admin","Finish work by 5pm"],
-    Wednesday:["Part-time job 8am–1pm","Gym + lunch","TransformHER development block","30 mins JG admin","Finish work by 5pm"],
+    Wednesday:["Part-time job 8am–1pm","Gym + lunch","TransformHER CEO development block","30 mins JG admin","Finish work by 5pm"],
     Thursday:["Part-time job 8am–1pm","Pilates / training + lunch","Travel content block","30 mins JG admin","Finish work by 5pm"],
     Friday:["Part-time job 8am–1pm","Training / run + lunch","CEO review and planning","30 mins JG admin","Close the week calmly"],
     Saturday:["No business work","Enjoy the day","Do something that fills your cup"],
     Sunday:["No business work","Rest and reset","Prepare gently for Monday"]
   };
 
-  function dailyKey(name){ return `ceohq-${now.toISOString().slice(0,10)}-${name}`; }
+  function currentDateKey(){
+    const d=new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  }
+  function dailyKey(name){ return `ceohq-${currentDateKey()}-${name}`; }
 
   const tasksEl = document.getElementById("dailyTasks");
   weekdayTasks[day].forEach((text,i)=>{
@@ -436,11 +603,84 @@
     });
   });
 
+  const dailyResetFields=["priority1","priority2","priority3","water","mood","reading","dailyWin"];
+
+  function clearDailySavedData(){
+    dailyResetFields.forEach(name=>localStorage.removeItem("ceohq-"+name));
+  }
+
+  function checkForNewDay(){
+    const today=currentDateKey();
+    const lastDate=localStorage.getItem("ceohq-last-active-date");
+
+    if(lastDate && lastDate!==today){
+      clearDailySavedData();
+    }
+
+    localStorage.setItem("ceohq-last-active-date",today);
+    return lastDate && lastDate!==today;
+  }
+
+  const openedOnNewDay=checkForNewDay();
+
   document.querySelectorAll("[data-save]").forEach(el=>{
     const key="ceohq-"+el.dataset.save;
     el.value=localStorage.getItem(key)||"";
     el.addEventListener("input",()=>localStorage.setItem(key,el.value));
   });
+
+
+  function priorityCheckKey(index){ return dailyKey("priority-check-"+index); }
+
+  function updatePriorityProgress(){
+    const checks=[...document.querySelectorAll("[data-priority-check]")];
+    const done=checks.filter(cb=>cb.checked).length;
+    const count=document.getElementById("priorityCount");
+    const fill=document.getElementById("priorityFill");
+    const celebration=document.getElementById("priorityCelebration");
+    if(count)count.textContent=`${done}/3 complete`;
+    if(fill)fill.style.width=`${done/3*100}%`;
+    if(celebration)celebration.classList.toggle("show",done===3);
+    if(done===3) renderWelcome("Incredible work — your top priorities are complete. ✨");
+    else renderWelcome();
+    checks.forEach(cb=>cb.closest(".priority-row")?.classList.toggle("complete",cb.checked));
+    updateTodayFocus();
+    updateProgress();
+  }
+
+  document.querySelectorAll("[data-priority-check]").forEach(cb=>{
+    const index=cb.dataset.priorityCheck;
+    cb.checked=localStorage.getItem(priorityCheckKey(index))==="1";
+    cb.addEventListener("change",()=>{
+      localStorage.setItem(priorityCheckKey(index),cb.checked?"1":"0");
+      updatePriorityProgress();
+    });
+  });
+
+  document.querySelectorAll('[data-save^="priority"]').forEach(input=>{
+    input.addEventListener("input",updateTodayFocus);
+  });
+
+  function updateTodayFocus(){
+    const greeting=document.getElementById("focusGreeting");
+    const workout=document.getElementById("focusWorkout");
+    const priority=document.getElementById("focusPriority");
+    const water=document.getElementById("focusWater");
+
+    if(greeting)greeting.textContent=`${greetingText || "Today"}, focus on what matters most`;
+    if(workout && document.getElementById("todayWorkoutTitle")){
+      workout.textContent=document.getElementById("todayWorkoutTitle").textContent || "Today’s workout";
+    }
+
+    const priorityInputs=[...document.querySelectorAll('[data-save^="priority"]')];
+    const priorityChecks=[...document.querySelectorAll("[data-priority-check]")];
+    const firstOpen=priorityInputs.find((input,i)=>input.value.trim() && !priorityChecks[i]?.checked);
+    if(priority)priority.textContent=firstOpen?.value.trim() || (priorityChecks.every(cb=>cb.checked) && priorityChecks.length ? "Top priorities complete ✨" : "Choose your first priority");
+
+    const waterInput=document.querySelector('[data-save="water"]');
+    if(water)water.textContent=waterInput?.value ? `${waterInput.value} glasses of water logged` : "Log your water as you go";
+  }
+
 
   document.querySelectorAll("[data-track]").forEach(el=>{
     const key="ceohq-"+el.dataset.track;
@@ -449,12 +689,13 @@
   });
 
   function updateProgress(){
-    const boxes=[...document.querySelectorAll("[data-daily]")];
+    const boxes=[...document.querySelectorAll("[data-daily], [data-priority-check]")];
     const done=boxes.filter(b=>b.checked).length;
     const pct=Math.round(done/boxes.length*100);
     document.getElementById("progressRing").style.setProperty("--progress",pct+"%");
     document.getElementById("progressText").textContent=pct+"%";
-    document.getElementById("progressCaption").textContent=pct===100?"You’ve done enough for today. ✨":pct>=60?"You’re making lovely progress.":pct>0?"Keep it gentle and focused.":"Start with one small win.";
+    document.getElementById("progressCaption").textContent=pct===100?"CEO mode: complete. You’ve done enough for today. ✨":pct>=60?"You’re making lovely progress.":pct>0?"Keep it gentle and focused.":"Start with one small win.";
+    if(pct===100) renderWelcome("CEO mode: complete. See you tomorrow. ✅");
   }
   updateProgress();
 
@@ -462,10 +703,51 @@
     alert("Everything is saved automatically on this device ✨");
   }
   function resetDaily(){
+    if(!confirm("Reset today’s priorities, checklist, water, mood, reading and daily win? Your workout history, previous weights and weekly plan will stay saved."))return;
+
     document.querySelectorAll("[data-daily]").forEach((cb,i)=>{
-      cb.checked=false; localStorage.removeItem(dailyKey("task"+i)); cb.closest(".task").classList.remove("done");
+      cb.checked=false;
+      localStorage.removeItem(dailyKey("task"+i));
+      cb.closest(".task")?.classList.remove("done");
     });
+
+    document.querySelectorAll("[data-priority-check]").forEach(cb=>{
+      cb.checked=false;
+      localStorage.removeItem(priorityCheckKey(cb.dataset.priorityCheck));
+    });
+
+    clearDailySavedData();
+    dailyResetFields.forEach(name=>{
+      const el=document.querySelector(`[data-save="${name}"]`);
+      if(el)el.value="";
+    });
+
+    updatePriorityProgress();
+    updateTodayFocus();
     updateProgress();
+    toast("Today has been reset ✨");
+  }
+
+
+  const resetTodayButton=document.getElementById("resetTodayButton");
+  if(resetTodayButton)resetTodayButton.addEventListener("click",resetDaily);
+  const waterFocusInput=document.querySelector('[data-save="water"]');
+  if(waterFocusInput)waterFocusInput.addEventListener("input",updateTodayFocus);
+  updatePriorityProgress();
+  updateTodayFocus();
+
+  let activeDateKey=currentDateKey();
+  setInterval(()=>{
+    const newDateKey=currentDateKey();
+    if(newDateKey!==activeDateKey){
+      clearDailySavedData();
+      localStorage.setItem("ceohq-last-active-date",newDateKey);
+      window.location.reload();
+    }
+  },60000);
+
+  if(openedOnNewDay){
+    setTimeout(()=>toast("A fresh day is ready ✨"),350);
   }
 
 const sectionFields={priorities:["priority1","priority2","priority3"],notes:["quickNotes"],wellbeing:["water","mood","reading"],dailywin:["dailyWin"],travel:["travelTasks"],uw:["uwTasks"],app:["appTasks"],jg:["jgTasks"],gratitude:["gratitude"],weeklyreflection:["weeklyProud","weeklyWorked","weeklyImprove"],weeklynumbers:["travelIncome","uwIncome","jgIncome","workoutsDone"]};
@@ -476,7 +758,7 @@ function toast(m){const e=document.getElementById("saveToast");e.textContent=m;e
 function saveSection(sec){const st=getStore(),wk=weekKey(new Date());if(!st[wk])st[wk]=[];const values={};(sectionFields[sec]||[]).forEach(n=>{const e=document.querySelector(`[data-save="${n}"]`);values[n]=e?e.value.trim():""});st[wk].push({id:Date.now(),section:sec,date:new Date().toISOString(),values});localStorage.setItem("ceohq-progress",JSON.stringify(st));toast("Saved to Progress ✨");renderProgress()}
 document.querySelectorAll("[data-section-save]").forEach(b=>b.addEventListener("click",()=>saveSection(b.dataset.sectionSave)));
 let weekOffset=0;
-const labels={priorities:"Top priorities",notes:"Quick notes",wellbeing:"Wellbeing",dailywin:"Today’s win",travel:"Travel business",uw:"Utilities Warehouse",app:"TransformHER app",jg:"JG admin",gratitude:"Gratitude",weeklyreflection:"Weekly reflection",weeklynumbers:"Weekly numbers",travelcall:"Travel call"};
+const labels={priorities:"Top priorities",notes:"Quick notes",wellbeing:"Wellbeing",dailywin:"Today’s win",travel:"Travel business",uw:"Utilities Warehouse",app:"TransformHER CEO",jg:"JG admin",gratitude:"Gratitude",weeklyreflection:"Weekly reflection",weeklynumbers:"Weekly numbers",travelcall:"Travel call"};
 function renderProgress(){const start=new Date();start.setDate(start.getDate()+weekOffset*7);const ws=getWeekStart(start),we=new Date(ws);we.setDate(we.getDate()+6);const entries=getStore()[weekKey(ws)]||[];document.getElementById("weekLabel").textContent=`${ws.toLocaleDateString("en-GB",{day:"numeric",month:"short"})} – ${we.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}`;const c={};entries.forEach(e=>c[e.section]=(c[e.section]||0)+1);document.getElementById("progressSummary").innerHTML=[["Travel",c.travel||0],["UW",c.uw||0],["TransformHER",c.app||0],["JG Admin",c.jg||0],["Wellbeing",c.wellbeing||0],["Reflections",(c.dailywin||0)+(c.weeklyreflection||0)]].map(x=>`<div class="summary-pill"><strong>${x[1]}</strong>${x[0]} saves</div>`).join("");document.getElementById("progressEntries").innerHTML=entries.length?entries.slice().reverse().map(e=>`<div class="progress-entry"><div class="meta">${new Date(e.date).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div><h3 style="font-size:1.05rem;margin-bottom:8px">${labels[e.section]||e.section}</h3>${Object.entries(e.values).filter(x=>x[1]!=="").map(x=>`<div><strong>${x[0].replace(/([A-Z])/g," $1")}:</strong> ${x[1]}</div>`).join("")||"<div class='muted'>Saved with no text entered.</div>"}</div>`).join(""):"<div class='muted'>Nothing saved for this week yet.</div>"}
 document.getElementById("prevWeek").addEventListener("click",()=>{weekOffset--;renderProgress()});document.getElementById("nextWeek").addEventListener("click",()=>{weekOffset++;renderProgress()});renderProgress();
 
@@ -526,39 +808,77 @@ const stairPlan=[["2:00", "Warm-up", "3/10"], ["1:00", "Build", "5/10"], ["1:00"
 const trainingDays=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 
 function trainingKey(day){return "ceohq-training-"+day}
+function scheduleStore(){
+  try{
+    return JSON.parse(localStorage.getItem("ceohq-training-schedule")||"{}");
+  }catch(e){
+    return {};
+  }
+}
+function saveScheduleStore(store){
+  localStorage.setItem("ceohq-training-schedule",JSON.stringify(store));
+}
+function scheduledDayFor(workoutDay){
+  const store=scheduleStore();
+  return store[workoutDay]||workoutDay;
+}
+function workoutsForCalendarDay(calendarDay){
+  return trainingDays.filter(originalDay=>scheduledDayFor(originalDay)===calendarDay);
+}
 function renderTrainingWeek(){
- const wrap=document.getElementById("trainingWeek"); if(!wrap)return;
- wrap.innerHTML="";
- trainingDays.forEach(day=>{
-   const plan=trainingPlan[day], checked=localStorage.getItem(trainingKey(day))==="1";
-   const row=document.createElement("div"); row.className="training-day";
-   row.innerHTML=`<input type="checkbox" ${checked?"checked":""} aria-label="Complete ${day}">
-     <div class="training-day-copy" role="button" tabindex="0"><strong>${day}</strong><span>${plan.title}</span></div>
-     <button type="button" class="open-workout-btn" aria-label="Open ${day} workout">›</button>`;
-   const checkbox=row.querySelector("input");
-   const copy=row.querySelector(".training-day-copy");
-   const openBtn=row.querySelector(".open-workout-btn");
-   checkbox.addEventListener("click",e=>{
-     e.stopPropagation();
-     localStorage.setItem(trainingKey(day),e.target.checked?"1":"0");
-     updateTrainingProgress();
-   });
-   const openWorkout=(e)=>{
-     if(e)e.stopPropagation();
-     showWorkout(day);
-     const target=document.getElementById("selectedWorkoutTitle");
-     if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
-   };
-   copy.addEventListener("click",openWorkout);
-   copy.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openWorkout(e);}});
-   openBtn.addEventListener("click",openWorkout);
-   row.addEventListener("click",e=>{
-     if(e.target===checkbox||e.target===openBtn||copy.contains(e.target))return;
-     openWorkout(e);
-   });
-   wrap.appendChild(row);
- });
- updateTrainingProgress();
+  const wrap=document.getElementById("trainingWeek"); if(!wrap)return;
+  wrap.innerHTML="";
+
+  trainingDays.forEach(calendarDay=>{
+    const assigned=workoutsForCalendarDay(calendarDay);
+    const row=document.createElement("div");
+    row.className="training-day";
+    row.style.alignItems="flex-start";
+
+    const sessionNames=assigned.map(d=>trainingPlan[d].title);
+    const completed=assigned.length>0 && assigned.every(d=>localStorage.getItem(trainingKey(d))==="1");
+
+    row.innerHTML=`
+      <input type="checkbox" ${completed?"checked":""} aria-label="Complete ${calendarDay}">
+      <div class="training-day-copy">
+        <strong>${calendarDay}</strong>
+        <span>${sessionNames.length?sessionNames.join(" + "):"No session planned"}</span>
+        <div class="schedule-note">${assigned.length?assigned.map(d=>d===calendarDay?"Original day":`Moved from ${d}`).join(" · "):"Move a session here using the dropdown below."}</div>
+      </div>
+      <select class="day-select" aria-label="Choose session for ${calendarDay}">
+        <option value="">Move session…</option>
+        ${trainingDays.map(d=>`<option value="${d}">${trainingPlan[d].title}</option>`).join("")}
+      </select>`;
+
+    const checkbox=row.querySelector("input");
+    checkbox.addEventListener("click",e=>{
+      e.stopPropagation();
+      assigned.forEach(d=>localStorage.setItem(trainingKey(d),e.target.checked?"1":"0"));
+      updateTrainingProgress();
+      renderTrainingWeek();
+    });
+
+    const select=row.querySelector("select");
+    select.addEventListener("click",e=>e.stopPropagation());
+    select.addEventListener("change",e=>{
+      const workoutDay=e.target.value;
+      if(!workoutDay)return;
+      const store=scheduleStore();
+      store[workoutDay]=calendarDay;
+      saveScheduleStore(store);
+      renderTrainingWeek();
+      renderTodayWorkout();
+      toast(`${trainingPlan[workoutDay].title} moved to ${calendarDay} ✨`);
+    });
+
+    row.addEventListener("click",e=>{
+      if(e.target===checkbox||e.target===select)return;
+      if(assigned.length)openWorkoutView(assigned[0]);
+    });
+
+    wrap.appendChild(row);
+  });
+  updateTrainingProgress();
 }
 function updateTrainingProgress(){
  const done=trainingDays.filter(d=>localStorage.getItem(trainingKey(d))==="1").length;
@@ -602,25 +922,33 @@ function progressionMessage(item,lastExercise){
 function workoutRows(day,target,inputs=true){
   const plan=trainingPlan[day], wrap=document.getElementById(target); if(!wrap)return;
   const last=lastSessionFor(day);
+
   wrap.innerHTML=plan.items.map((x,i)=>{
     const prior=last&&last.exercises?last.exercises[i]:null;
     const sets=targetSets(x[1]);
-    const setInputs=inputs?Array.from({length:sets},(_,s)=>{
-      const draftKey=`ceohq-draft-${day}-${i}-${s}`;
-      let draft={}; try{draft=JSON.parse(localStorage.getItem(draftKey)||"{}")}catch(e){}
-      return `<div class="set-grid"><div class="set-label">Set ${s+1}</div>
-      <input inputmode="decimal" data-weight="${day}|${i}|${s}" placeholder="Weight" value="${draft.weight||""}">
-      <input inputmode="numeric" data-reps="${day}|${i}|${s}" placeholder="Reps" value="${draft.reps||""}"></div>`;
-    }).join(""):"";
-    const lastText=prior&&prior.sets&&prior.sets.length
-      ? prior.sets.map((s,idx)=>`Set ${idx+1}: ${s.weight||"—"} kg × ${s.reps||"—"}`).join(" · ")
-      : "No previous result saved.";
+
+    const setInputs=inputs?`
+      <div class="set-column-labels"><span></span><span>Weight</span><span>Reps</span></div>
+      ${Array.from({length:sets},(_,s)=>{
+        const draftKey=`ceohq-draft-${day}-${i}-${s}`;
+        let draft={}; try{draft=JSON.parse(localStorage.getItem(draftKey)||"{}")}catch(e){}
+        const lastSet=prior&&prior.sets?prior.sets[s]:null;
+        const lastWeight=lastSet&&lastSet.weight!==""?lastSet.weight:"—";
+        const lastReps=lastSet&&lastSet.reps!==""?lastSet.reps:"—";
+        return `<div class="set-grid">
+          <div class="set-label">Set ${s+1}</div>
+          <input inputmode="decimal" data-weight="${day}|${i}|${s}" placeholder="${lastWeight!=="—"?"Last: "+lastWeight+" kg":"Weight"}" value="${draft.weight||""}">
+          <input inputmode="numeric" data-reps="${day}|${i}|${s}" placeholder="${lastReps!=="—"?"Last: "+lastReps:"Reps"}" value="${draft.reps||""}">
+          <div class="last-set-line"><strong>Last time:</strong> ${lastWeight} kg × ${lastReps} reps</div>
+        </div>`;
+      }).join("")}`:"";
+
     return `<div class="${target==="todayWorkoutExercises"?"today-exercise":"exercise-row"}">
       <div class="exercise-top"><strong>${x[0]}</strong><small>${x[1]}</small></div>
-      ${inputs?`<div class="exercise-history"><strong>Last time:</strong> ${lastText}</div>
-      <div class="progression-tip"><strong>Next target:</strong> ${progressionMessage(x,prior)}</div>${setInputs}`:""}
+      ${inputs?`<div class="progression-tip"><strong>Progression:</strong> ${progressionMessage(x,prior)}</div>${setInputs}`:""}
     </div>`;
   }).join("");
+
   if(inputs){
     wrap.querySelectorAll("[data-weight],[data-reps]").forEach(el=>{
       el.addEventListener("input",()=>{
@@ -633,6 +961,24 @@ function workoutRows(day,target,inputs=true){
       });
     });
   }
+}
+function openWorkoutView(day){
+  showWorkout(day);
+  const view=document.getElementById("workoutView");
+  if(!view)return;
+  view.classList.add("open");
+  view.setAttribute("aria-hidden","false");
+  document.body.classList.add("workout-open");
+  view.scrollTo({top:0,behavior:"instant"});
+  history.pushState({workoutView:true},"",location.href);
+}
+function closeWorkoutView(useHistory=true){
+  const view=document.getElementById("workoutView");
+  if(!view)return;
+  view.classList.remove("open");
+  view.setAttribute("aria-hidden","true");
+  document.body.classList.remove("workout-open");
+  if(useHistory && history.state && history.state.workoutView)history.back();
 }
 function showWorkout(day){
   selectedTrainingDay=day;
@@ -687,27 +1033,68 @@ function renderWorkoutHistory(day=selectedTrainingDay){
   }).join("");
 }
 function renderTodayWorkout(){
- const day=new Date().toLocaleDateString("en-GB",{weekday:"long"}), p=trainingPlan[day];
- if(!p)return;
- document.getElementById("todayWorkoutTitle").textContent=day+" — "+p.title;
- document.getElementById("todayWorkoutSubtitle").textContent=p.subtitle;
- workoutRows(day,"todayWorkoutExercises",false);
- const btn=document.getElementById("completeTodayWorkout");
- const refresh=()=>{const done=localStorage.getItem(trainingKey(day))==="1";btn.textContent=done?"✓ Workout completed":"Mark workout complete";btn.classList.toggle("secondary",done)};
- btn.onclick=()=>{localStorage.setItem(trainingKey(day),localStorage.getItem(trainingKey(day))==="1"?"0":"1");refresh();renderTrainingWeek()};
- refresh();
+  const calendarDay=new Date().toLocaleDateString("en-GB",{weekday:"long"});
+  const assigned=workoutsForCalendarDay(calendarDay);
+  const workoutDay=assigned[0]||calendarDay;
+  const plan=trainingPlan[workoutDay];
+  if(!plan)return;
+
+  const movedText=workoutDay!==calendarDay?`Moved from ${workoutDay} · `:"";
+  document.getElementById("todayWorkoutTitle").textContent=plan.title;
+  document.getElementById("todayWorkoutSubtitle").textContent=movedText+plan.subtitle;
+  if(typeof updateTodayFocus==="function")updateTodayFocus();
+
+  const openToday=()=>{
+    const trainingTab=document.querySelector('[data-tab="training"]');
+    if(trainingTab)trainingTab.click();
+    openWorkoutView(workoutDay);
+  };
+
+  const card=document.getElementById("todayWorkoutCard");
+  const button=document.getElementById("openTodayWorkout");
+
+  card.onclick=e=>{
+    if(e.target===button)return;
+    openToday();
+  };
+  card.onkeydown=e=>{
+    if(e.key==="Enter"||e.key===" "){
+      e.preventDefault();
+      openToday();
+    }
+  };
+  button.onclick=e=>{
+    e.stopPropagation();
+    openToday();
+  };
 }
+document.getElementById("closeWorkoutView").addEventListener("click",()=>closeWorkoutView(true));
+window.addEventListener("popstate",()=>{
+  const view=document.getElementById("workoutView");
+  if(view && view.classList.contains("open"))closeWorkoutView(false);
+});
+
 function renderStairs(){
  const wrap=document.getElementById("stairIntervals"); if(!wrap)return;
  wrap.innerHTML=stairPlan.map(x=>`<div class="interval-row"><strong>${x[0]}</strong><span>${x[1]}</span><small>${x[2]}</small></div>`).join("");
 }
 document.getElementById("saveWorkoutSession").addEventListener("click",saveWorkoutSession);
 document.getElementById("clearWorkoutInputs").addEventListener("click",clearWorkoutInputs);
-document.getElementById("resetTrainingWeek").addEventListener("click",()=>{if(confirm("Reset this week’s training ticks?")){trainingDays.forEach(d=>localStorage.removeItem(trainingKey(d)));renderTrainingWeek();renderTodayWorkout()}});
+document.getElementById("resetTrainingWeek").addEventListener("click",()=>{
+  if(confirm("Reset this week’s training ticks and move sessions back to their original days?")){
+    trainingDays.forEach(d=>localStorage.removeItem(trainingKey(d)));
+    localStorage.removeItem("ceohq-training-schedule");
+    renderTrainingWeek();
+    renderTodayWorkout();
+  }
+});
 document.getElementById("saveTrainingNotes").addEventListener("click",()=>{localStorage.setItem("ceohq-training-notes",document.getElementById("trainingNotes").value);toast("Training notes saved ✨")});
 document.getElementById("trainingNotes").value=localStorage.getItem("ceohq-training-notes")||"";
 renderTrainingWeek(); renderTodayWorkout(); renderStairs(); showWorkout(new Date().toLocaleDateString("en-GB",{weekday:"long"})); renderWorkoutHistory();
 
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js").catch(()=>{}));
+  }
 </script>
 </body>
 </html>
