@@ -116,7 +116,7 @@
     .training-day input{flex:0 0 auto}
     .training-day-copy{flex:1}
     .training-day-copy strong{display:block;color:var(--taupe-dark)}
-    .training-day-copy span{font-size:.9rem;color:var(--muted)}.open-workout-btn{border:0;background:transparent;color:var(--taupe-dark);padding:12px 8px;font-size:1.2rem;cursor:pointer;touch-action:manipulation}
+    .training-day-copy span{font-size:.9rem;color:var(--muted)}.day-select{border:1px solid var(--line);background:var(--paper);color:var(--taupe-dark);padding:8px 10px;border-radius:10px;font-weight:700;font-size:.86rem}.schedule-note{margin-top:8px;font-size:.8rem;color:var(--muted)}.open-workout-btn{border:0;background:transparent;color:var(--taupe-dark);padding:12px 8px;font-size:1.2rem;cursor:pointer;touch-action:manipulation}
     .exercise-row{padding:12px 0;border-bottom:1px dashed var(--line)}
     .exercise-row:last-child{border-bottom:0}
     .exercise-top{display:flex;justify-content:space-between;gap:12px}
@@ -526,39 +526,81 @@ const stairPlan=[["2:00", "Warm-up", "3/10"], ["1:00", "Build", "5/10"], ["1:00"
 const trainingDays=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 
 function trainingKey(day){return "ceohq-training-"+day}
+function scheduleStore(){
+  try{
+    return JSON.parse(localStorage.getItem("ceohq-training-schedule")||"{}");
+  }catch(e){
+    return {};
+  }
+}
+function saveScheduleStore(store){
+  localStorage.setItem("ceohq-training-schedule",JSON.stringify(store));
+}
+function scheduledDayFor(workoutDay){
+  const store=scheduleStore();
+  return store[workoutDay]||workoutDay;
+}
+function workoutsForCalendarDay(calendarDay){
+  return trainingDays.filter(originalDay=>scheduledDayFor(originalDay)===calendarDay);
+}
 function renderTrainingWeek(){
- const wrap=document.getElementById("trainingWeek"); if(!wrap)return;
- wrap.innerHTML="";
- trainingDays.forEach(day=>{
-   const plan=trainingPlan[day], checked=localStorage.getItem(trainingKey(day))==="1";
-   const row=document.createElement("div"); row.className="training-day";
-   row.innerHTML=`<input type="checkbox" ${checked?"checked":""} aria-label="Complete ${day}">
-     <div class="training-day-copy" role="button" tabindex="0"><strong>${day}</strong><span>${plan.title}</span></div>
-     <button type="button" class="open-workout-btn" aria-label="Open ${day} workout">›</button>`;
-   const checkbox=row.querySelector("input");
-   const copy=row.querySelector(".training-day-copy");
-   const openBtn=row.querySelector(".open-workout-btn");
-   checkbox.addEventListener("click",e=>{
-     e.stopPropagation();
-     localStorage.setItem(trainingKey(day),e.target.checked?"1":"0");
-     updateTrainingProgress();
-   });
-   const openWorkout=(e)=>{
-     if(e)e.stopPropagation();
-     showWorkout(day);
-     const target=document.getElementById("selectedWorkoutTitle");
-     if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
-   };
-   copy.addEventListener("click",openWorkout);
-   copy.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openWorkout(e);}});
-   openBtn.addEventListener("click",openWorkout);
-   row.addEventListener("click",e=>{
-     if(e.target===checkbox||e.target===openBtn||copy.contains(e.target))return;
-     openWorkout(e);
-   });
-   wrap.appendChild(row);
- });
- updateTrainingProgress();
+  const wrap=document.getElementById("trainingWeek"); if(!wrap)return;
+  wrap.innerHTML="";
+
+  trainingDays.forEach(calendarDay=>{
+    const assigned=workoutsForCalendarDay(calendarDay);
+    const row=document.createElement("div");
+    row.className="training-day";
+    row.style.alignItems="flex-start";
+
+    const sessionNames=assigned.map(d=>trainingPlan[d].title);
+    const completed=assigned.length>0 && assigned.every(d=>localStorage.getItem(trainingKey(d))==="1");
+
+    row.innerHTML=`
+      <input type="checkbox" ${completed?"checked":""} aria-label="Complete ${calendarDay}">
+      <div class="training-day-copy">
+        <strong>${calendarDay}</strong>
+        <span>${sessionNames.length?sessionNames.join(" + "):"No session planned"}</span>
+        <div class="schedule-note">${assigned.length?assigned.map(d=>d===calendarDay?"Original day":`Moved from ${d}`).join(" · "):"Move a session here using the dropdown below."}</div>
+      </div>
+      <select class="day-select" aria-label="Choose session for ${calendarDay}">
+        <option value="">Move session…</option>
+        ${trainingDays.map(d=>`<option value="${d}">${trainingPlan[d].title}</option>`).join("")}
+      </select>`;
+
+    const checkbox=row.querySelector("input");
+    checkbox.addEventListener("click",e=>{
+      e.stopPropagation();
+      assigned.forEach(d=>localStorage.setItem(trainingKey(d),e.target.checked?"1":"0"));
+      updateTrainingProgress();
+      renderTrainingWeek();
+    });
+
+    const select=row.querySelector("select");
+    select.addEventListener("click",e=>e.stopPropagation());
+    select.addEventListener("change",e=>{
+      const workoutDay=e.target.value;
+      if(!workoutDay)return;
+      const store=scheduleStore();
+      store[workoutDay]=calendarDay;
+      saveScheduleStore(store);
+      renderTrainingWeek();
+      renderTodayWorkout();
+      toast(`${trainingPlan[workoutDay].title} moved to ${calendarDay} ✨`);
+    });
+
+    row.addEventListener("click",e=>{
+      if(e.target===checkbox||e.target===select)return;
+      if(assigned.length){
+        showWorkout(assigned[0]);
+        const target=document.getElementById("selectedWorkoutTitle");
+        if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
+      }
+    });
+
+    wrap.appendChild(row);
+  });
+  updateTrainingProgress();
 }
 function updateTrainingProgress(){
  const done=trainingDays.filter(d=>localStorage.getItem(trainingKey(d))==="1").length;
@@ -695,15 +737,29 @@ function renderWorkoutHistory(day=selectedTrainingDay){
   }).join("");
 }
 function renderTodayWorkout(){
- const day=new Date().toLocaleDateString("en-GB",{weekday:"long"}), p=trainingPlan[day];
- if(!p)return;
- document.getElementById("todayWorkoutTitle").textContent=day+" — "+p.title;
- document.getElementById("todayWorkoutSubtitle").textContent=p.subtitle;
- workoutRows(day,"todayWorkoutExercises",false);
- const btn=document.getElementById("completeTodayWorkout");
- const refresh=()=>{const done=localStorage.getItem(trainingKey(day))==="1";btn.textContent=done?"✓ Workout completed":"Mark workout complete";btn.classList.toggle("secondary",done)};
- btn.onclick=()=>{localStorage.setItem(trainingKey(day),localStorage.getItem(trainingKey(day))==="1"?"0":"1");refresh();renderTrainingWeek()};
- refresh();
+  const calendarDay=new Date().toLocaleDateString("en-GB",{weekday:"long"});
+  const assigned=workoutsForCalendarDay(calendarDay);
+  const day=assigned[0]||calendarDay;
+  const p=trainingPlan[day];
+  if(!p)return;
+
+  const movedText=day!==calendarDay?` · moved from ${day}`:"";
+  document.getElementById("todayWorkoutTitle").textContent=calendarDay+" — "+p.title;
+  document.getElementById("todayWorkoutSubtitle").textContent=p.subtitle+movedText;
+  workoutRows(day,"todayWorkoutExercises",false);
+
+  const btn=document.getElementById("completeTodayWorkout");
+  const refresh=()=>{
+    const done=localStorage.getItem(trainingKey(day))==="1";
+    btn.textContent=done?"✓ Workout completed":"Mark workout complete";
+    btn.classList.toggle("secondary",done);
+  };
+  btn.onclick=()=>{
+    localStorage.setItem(trainingKey(day),localStorage.getItem(trainingKey(day))==="1"?"0":"1");
+    refresh();
+    renderTrainingWeek();
+  };
+  refresh();
 }
 function renderStairs(){
  const wrap=document.getElementById("stairIntervals"); if(!wrap)return;
@@ -711,7 +767,14 @@ function renderStairs(){
 }
 document.getElementById("saveWorkoutSession").addEventListener("click",saveWorkoutSession);
 document.getElementById("clearWorkoutInputs").addEventListener("click",clearWorkoutInputs);
-document.getElementById("resetTrainingWeek").addEventListener("click",()=>{if(confirm("Reset this week’s training ticks?")){trainingDays.forEach(d=>localStorage.removeItem(trainingKey(d)));renderTrainingWeek();renderTodayWorkout()}});
+document.getElementById("resetTrainingWeek").addEventListener("click",()=>{
+  if(confirm("Reset this week’s training ticks and move sessions back to their original days?")){
+    trainingDays.forEach(d=>localStorage.removeItem(trainingKey(d)));
+    localStorage.removeItem("ceohq-training-schedule");
+    renderTrainingWeek();
+    renderTodayWorkout();
+  }
+});
 document.getElementById("saveTrainingNotes").addEventListener("click",()=>{localStorage.setItem("ceohq-training-notes",document.getElementById("trainingNotes").value);toast("Training notes saved ✨")});
 document.getElementById("trainingNotes").value=localStorage.getItem("ceohq-training-notes")||"";
 renderTrainingWeek(); renderTodayWorkout(); renderStairs(); showWorkout(new Date().toLocaleDateString("en-GB",{weekday:"long"})); renderWorkoutHistory();
