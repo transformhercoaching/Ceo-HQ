@@ -179,6 +179,24 @@
       }
     }
 
+
+    .focus-card{background:linear-gradient(135deg,var(--paper),rgba(255,255,255,.72))}
+    .focus-list{display:grid;gap:9px;margin-top:14px}
+    .focus-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.55)}
+    .focus-icon{width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:var(--rose-light);flex:0 0 auto}
+    .priority-progress-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 12px}
+    .priority-count{font-size:.82rem;font-weight:800;color:var(--taupe-dark)}
+    .priority-track{height:7px;flex:1;background:var(--line);border-radius:999px;overflow:hidden}
+    .priority-fill{height:100%;width:0;background:var(--taupe);border-radius:999px;transition:width .25s ease}
+    .priority-row{display:grid;grid-template-columns:26px minmax(0,1fr);gap:8px;align-items:center;margin-top:9px}
+    .priority-row input[type="checkbox"]{width:21px;height:21px;margin:0;accent-color:var(--taupe);cursor:pointer}
+    .priority-row input[type="text"]{margin:0;min-width:0}
+    .priority-row.complete input[type="text"]{text-decoration:line-through;opacity:.58}
+    .priority-celebration{display:none;margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--rose-light);font-size:.88rem;font-weight:700}
+    .priority-celebration.show{display:block}
+    .daily-reset-wrap{display:flex;justify-content:flex-end;margin-top:16px}
+    .danger-soft{background:transparent;border:1px solid var(--line);color:var(--taupe-dark)}
+
 </style>
 </head>
 <body>
@@ -219,6 +237,18 @@
       <div class="grid">
 
         
+        
+        <div class="card wide focus-card">
+          <div class="muted today-workout-label">TODAY’S FOCUS</div>
+          <h3 id="focusGreeting">Keep today simple</h3>
+          <div class="focus-list">
+            <div class="focus-item"><span class="focus-icon">💪</span><span id="focusWorkout">Today’s workout</span></div>
+            <div class="focus-item"><span class="focus-icon">🎯</span><span id="focusPriority">Choose your first priority</span></div>
+            <div class="focus-item"><span class="focus-icon">🚶</span><span>Move gently and aim for your daily steps</span></div>
+            <div class="focus-item"><span class="focus-icon">💧</span><span id="focusWater">Log your water as you go</span></div>
+          </div>
+        </div>
+
         <div class="card wide today-workout-card" id="todayWorkoutCard" role="button" tabindex="0">
           <div class="today-workout-card-top">
             <div>
@@ -234,13 +264,29 @@
           <h3>Today’s checklist</h3>
           <div id="dailyTasks"></div>
         </div>
-        <div class="card">
+        
+        <div class="card" id="prioritiesCard">
           <h3>Top 3 priorities</h3>
-          <input type="text" data-save="priority1" placeholder="Priority one">
-          <input type="text" data-save="priority2" placeholder="Priority two" style="margin-top:9px">
-          <input type="text" data-save="priority3" placeholder="Priority three" style="margin-top:9px"><button class="btn section-save" data-section-save="priorities" style="margin-top:12px">Save priorities</button>
+          <div class="priority-progress-row">
+            <div class="priority-track"><div class="priority-fill" id="priorityFill"></div></div>
+            <span class="priority-count" id="priorityCount">0/3 complete</span>
+          </div>
+          <div class="priority-row">
+            <input type="checkbox" data-priority-check="1" aria-label="Complete priority one">
+            <input type="text" data-save="priority1" placeholder="Priority one">
+          </div>
+          <div class="priority-row">
+            <input type="checkbox" data-priority-check="2" aria-label="Complete priority two">
+            <input type="text" data-save="priority2" placeholder="Priority two">
+          </div>
+          <div class="priority-row">
+            <input type="checkbox" data-priority-check="3" aria-label="Complete priority three">
+            <input type="text" data-save="priority3" placeholder="Priority three">
+          </div>
+          <div class="priority-celebration" id="priorityCelebration">Amazing — your top priorities are complete for today ✨</div>
+          <button class="btn section-save" data-section-save="priorities" style="margin-top:12px">Save priorities</button>
         </div>
-        <div class="card">
+<div class="card">
           <h3>Quick notes</h3>
           <textarea data-save="quickNotes" placeholder="Ideas, reminders, anything on your mind..."></textarea><button class="btn section-save" data-section-save="notes" style="margin-top:12px">Save notes</button>
         </div>
@@ -254,6 +300,9 @@
           <h3>Today’s win</h3>
           <textarea data-save="dailyWin" placeholder="What are you proud of today?"></textarea><button class="btn section-save" data-section-save="dailywin" style="margin-top:12px">Save today’s win</button>
         </div>
+      </div>
+      <div class="daily-reset-wrap">
+        <button class="btn danger-soft" id="resetTodayButton">Reset today</button>
       </div>
     </section>
 
@@ -439,6 +488,7 @@
   document.getElementById("todayDate").textContent = now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const greetingText = greeting;
   document.getElementById("greeting").textContent = `${greeting}, Jasmine`;
   document.getElementById("dayFocus").textContent = themes[day][0];
   document.getElementById("quote").textContent = `“${quotes[now.getDate()%quotes.length]}”`;
@@ -480,6 +530,57 @@
     el.addEventListener("input",()=>localStorage.setItem(key,el.value));
   });
 
+
+  function priorityCheckKey(index){ return dailyKey("priority-check-"+index); }
+
+  function updatePriorityProgress(){
+    const checks=[...document.querySelectorAll("[data-priority-check]")];
+    const done=checks.filter(cb=>cb.checked).length;
+    const count=document.getElementById("priorityCount");
+    const fill=document.getElementById("priorityFill");
+    const celebration=document.getElementById("priorityCelebration");
+    if(count)count.textContent=`${done}/3 complete`;
+    if(fill)fill.style.width=`${done/3*100}%`;
+    if(celebration)celebration.classList.toggle("show",done===3);
+    checks.forEach(cb=>cb.closest(".priority-row")?.classList.toggle("complete",cb.checked));
+    updateTodayFocus();
+    updateProgress();
+  }
+
+  document.querySelectorAll("[data-priority-check]").forEach(cb=>{
+    const index=cb.dataset.priorityCheck;
+    cb.checked=localStorage.getItem(priorityCheckKey(index))==="1";
+    cb.addEventListener("change",()=>{
+      localStorage.setItem(priorityCheckKey(index),cb.checked?"1":"0");
+      updatePriorityProgress();
+    });
+  });
+
+  document.querySelectorAll('[data-save^="priority"]').forEach(input=>{
+    input.addEventListener("input",updateTodayFocus);
+  });
+
+  function updateTodayFocus(){
+    const greeting=document.getElementById("focusGreeting");
+    const workout=document.getElementById("focusWorkout");
+    const priority=document.getElementById("focusPriority");
+    const water=document.getElementById("focusWater");
+
+    if(greeting)greeting.textContent=`${greetingText || "Today"}, focus on what matters most`;
+    if(workout && document.getElementById("todayWorkoutTitle")){
+      workout.textContent=document.getElementById("todayWorkoutTitle").textContent || "Today’s workout";
+    }
+
+    const priorityInputs=[...document.querySelectorAll('[data-save^="priority"]')];
+    const priorityChecks=[...document.querySelectorAll("[data-priority-check]")];
+    const firstOpen=priorityInputs.find((input,i)=>input.value.trim() && !priorityChecks[i]?.checked);
+    if(priority)priority.textContent=firstOpen?.value.trim() || (priorityChecks.every(cb=>cb.checked) && priorityChecks.length ? "Top priorities complete ✨" : "Choose your first priority");
+
+    const waterInput=document.querySelector('[data-save="water"]');
+    if(water)water.textContent=waterInput?.value ? `${waterInput.value} glasses of water logged` : "Log your water as you go";
+  }
+
+
   document.querySelectorAll("[data-track]").forEach(el=>{
     const key="ceohq-"+el.dataset.track;
     el.checked=localStorage.getItem(key)==="1";
@@ -487,7 +588,7 @@
   });
 
   function updateProgress(){
-    const boxes=[...document.querySelectorAll("[data-daily]")];
+    const boxes=[...document.querySelectorAll("[data-daily], [data-priority-check]")];
     const done=boxes.filter(b=>b.checked).length;
     const pct=Math.round(done/boxes.length*100);
     document.getElementById("progressRing").style.setProperty("--progress",pct+"%");
@@ -500,11 +601,38 @@
     alert("Everything is saved automatically on this device ✨");
   }
   function resetDaily(){
+    if(!confirm("Reset today’s priorities, checklist, water, mood, reading and daily win? Your workout history, previous weights and weekly plan will stay saved."))return;
+
     document.querySelectorAll("[data-daily]").forEach((cb,i)=>{
-      cb.checked=false; localStorage.removeItem(dailyKey("task"+i)); cb.closest(".task").classList.remove("done");
+      cb.checked=false;
+      localStorage.removeItem(dailyKey("task"+i));
+      cb.closest(".task")?.classList.remove("done");
     });
+
+    document.querySelectorAll("[data-priority-check]").forEach(cb=>{
+      cb.checked=false;
+      localStorage.removeItem(priorityCheckKey(cb.dataset.priorityCheck));
+    });
+
+    ["priority1","priority2","priority3","water","mood","reading","dailyWin"].forEach(name=>{
+      localStorage.removeItem("ceohq-"+name);
+      const el=document.querySelector(`[data-save="${name}"]`);
+      if(el)el.value="";
+    });
+
+    updatePriorityProgress();
+    updateTodayFocus();
     updateProgress();
+    toast("Today has been reset ✨");
   }
+
+
+  const resetTodayButton=document.getElementById("resetTodayButton");
+  if(resetTodayButton)resetTodayButton.addEventListener("click",resetDaily);
+  const waterFocusInput=document.querySelector('[data-save="water"]');
+  if(waterFocusInput)waterFocusInput.addEventListener("input",updateTodayFocus);
+  updatePriorityProgress();
+  updateTodayFocus();
 
 const sectionFields={priorities:["priority1","priority2","priority3"],notes:["quickNotes"],wellbeing:["water","mood","reading"],dailywin:["dailyWin"],travel:["travelTasks"],uw:["uwTasks"],app:["appTasks"],jg:["jgTasks"],gratitude:["gratitude"],weeklyreflection:["weeklyProud","weeklyWorked","weeklyImprove"],weeklynumbers:["travelIncome","uwIncome","jgIncome","workoutsDone"]};
 function getWeekStart(date){const d=new Date(date);const n=d.getDay();d.setDate(d.getDate()-n+(n===0?-6:1));d.setHours(0,0,0,0);return d}
@@ -784,6 +912,7 @@ function renderTodayWorkout(){
   const movedText=workoutDay!==calendarDay?`Moved from ${workoutDay} · `:"";
   document.getElementById("todayWorkoutTitle").textContent=plan.title;
   document.getElementById("todayWorkoutSubtitle").textContent=movedText+plan.subtitle;
+  if(typeof updateTodayFocus==="function")updateTodayFocus();
 
   const openToday=()=>{
     showWorkout(workoutDay);
