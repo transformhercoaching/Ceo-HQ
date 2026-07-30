@@ -88,7 +88,7 @@
     .day h3{font-size:1.05rem;margin-bottom:10px}
     .block{padding:9px 10px;border-radius:12px;margin:7px 0;font-size:.84rem;line-height:1.35}
     .job{background:#E6EEF6}.gym{background:#E8F0E5}.travel{background:#F7E4E7}
-    .uw{background:#FFF1C9}.appdev{background:#EEE6F7}.jg{background:#E7ECEA}.ceo{background:#F4EAD8}
+    .uw{background:#FFF1C9}.appdev{background:#EEE6F7}.jg{background:#E7ECEA}.ceo{background:#F4EAD8}.social{background:#F8E2EC}.routine{background:#E9F0E6}.winddown{background:#EEE8F4}
     .weekend-note{
       margin-top:14px;background:linear-gradient(135deg,#F3E7E5,#FFFDFC);border:1px solid var(--line);
       border-radius:18px;padding:16px;text-align:center;font-weight:700;color:var(--taupe-dark)
@@ -217,6 +217,29 @@
     .workout-view .card{width:100%;margin-bottom:16px}
     body.workout-open{overflow:hidden}
 
+    .editable-calendar{grid-template-columns:repeat(auto-fit,minmax(205px,1fr));align-items:start}
+    .calendar-heading{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+    .calendar-day-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+    .calendar-day-header h3{margin:0}
+    .calendar-add{border:1px solid var(--line);background:var(--paper);color:var(--taupe-dark);min-height:32px;padding:6px 10px;border-radius:10px;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap}
+    .calendar-event{position:relative;padding:10px 34px 10px 11px;border-radius:12px;margin:7px 0;font-size:.84rem;line-height:1.35;cursor:pointer;border:1px solid transparent}
+    .calendar-event:hover{border-color:rgba(95,81,72,.18)}
+    .calendar-event-time{display:block;font-size:.73rem;font-weight:800;opacity:.72;margin-bottom:2px}
+    .calendar-event-title{font-weight:700;display:block}
+    .calendar-event-notes{display:block;margin-top:4px;font-size:.76rem;color:var(--muted);white-space:pre-wrap}
+    .calendar-delete{position:absolute;right:6px;top:6px;border:0;background:rgba(255,255,255,.6);width:24px;height:24px;border-radius:8px;color:var(--taupe-dark);cursor:pointer;font-size:.95rem;line-height:1}
+    .calendar-empty{padding:12px 0;color:var(--muted);font-size:.84rem}
+    .calendar-form{display:none;margin-top:10px;padding:11px;border:1px solid var(--line);border-radius:14px;background:#fffefd}
+    .calendar-form.open{display:block}
+    .calendar-time-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+    .calendar-form input,.calendar-form textarea{width:100%;border:1px solid var(--line);background:#FFFEFD;border-radius:10px;padding:9px;font:inherit;color:var(--ink)}
+    .calendar-form textarea{min-height:72px;resize:vertical;margin-top:8px}
+    .calendar-form-actions{display:flex;gap:7px;margin-top:8px}
+    .calendar-form-actions button{flex:1;padding:8px 9px;border-radius:10px}
+    .calendar-weekend{background:linear-gradient(180deg,#FFFDFC,#FBF1F5);border-color:#EAD9E1}
+    .calendar-weekend .calendar-day-header h3:after{content:" · social & rest";font-family:Inter,Arial,sans-serif;font-size:.7rem;font-weight:600;color:var(--muted)}
+    .routine{background:#F4EAD8}.winddown{background:#E9E2F0}
+
 </style>
 </head>
 <body>
@@ -328,40 +351,14 @@
 
     <section class="panel" id="week">
       <div class="card full">
-        <h3>Your Monday–Friday rhythm</h3>
-        <div class="schedule">
-          <div class="day"><h3>Monday — Travel</h3>
-            <div class="block job">8:00–1:00 Part-time job</div>
-            <div class="block gym">1:15–2:30 Full Body A + StairMaster</div>
-            <div class="block travel">3:00–4:30 Travel business</div>
-            <div class="block jg">4:30–5:00 JG admin</div>
+        <div class="calendar-heading">
+          <div>
+            <h3>Your weekly calendar</h3>
+            <p class="muted">Tap “+ Add event” on any day, then write your own description. Times and notes are optional, and everything saves automatically on this device.</p>
           </div>
-          <div class="day"><h3>Tuesday — UW</h3>
-            <div class="block job">8:00–1:00 Part-time job</div>
-            <div class="block gym">1:15–2:30 Run</div>
-            <div class="block uw">3:00–4:30 UW learning</div>
-            <div class="block jg">4:30–5:00 JG admin</div>
-          </div>
-          <div class="day"><h3>Wednesday — App</h3>
-            <div class="block job">8:00–1:00 Part-time job</div>
-            <div class="block gym">1:15–2:30 Full Body B + Bike</div>
-            <div class="block appdev">3:00–4:30 TransformHER</div>
-            <div class="block jg">4:30–5:00 JG admin</div>
-          </div>
-          <div class="day"><h3>Thursday — Content</h3>
-            <div class="block job">8:00–1:00 Part-time job</div>
-            <div class="block gym">1:15–2:30 Pilates & mobility</div>
-            <div class="block travel">3:00–4:30 Travel content</div>
-            <div class="block jg">4:30–5:00 JG admin</div>
-          </div>
-          <div class="day"><h3>Friday — CEO</h3>
-            <div class="block job">8:00–1:00 Part-time job</div>
-            <div class="block gym">1:15–2:30 Run</div>
-            <div class="block ceo">3:00–4:30 Review & planning</div>
-            <div class="block jg">4:30–5:00 JG admin</div>
-          </div>
+          <button class="btn secondary" id="resetWeeklyCalendar">Reset calendar</button>
         </div>
-        <div class="weekend-note"><strong>Saturday:</strong> Home workout &nbsp; • &nbsp; <strong>Sunday:</strong> Rest or gentle walk.<br>No scheduled business work — travel, rest, reading, family and fun. 🤍</div>
+        <div class="schedule editable-calendar" id="weeklyCalendar"></div>
       </div>
     </section>
 
@@ -767,6 +764,141 @@ document.getElementById("prevWeek").addEventListener("click",()=>{weekOffset--;r
       navigator.serviceWorker.register("./service-worker.js").catch(console.error);
     });
   }
+
+
+const calendarDays=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const defaultWeeklyCalendar={
+  Monday:[
+    {id:"mon-routine",start:"06:00",end:"07:00",title:"Morning routine",type:"routine"},
+    {id:"mon-work",start:"08:00",end:"13:00",title:"Work block",type:"job"},
+    {id:"mon-gym",start:"13:15",end:"14:30",title:"Full Body A + StairMaster",type:"gym"},
+    {id:"mon-travel",start:"15:00",end:"16:30",title:"Travel business",type:"travel"},
+    {id:"mon-jg",start:"16:30",end:"17:00",title:"JG admin",type:"jg"},
+    {id:"mon-wind",start:"21:00",end:"",title:"Phone off & wind down",type:"winddown"}
+  ],
+  Tuesday:[
+    {id:"tue-routine",start:"06:00",end:"07:00",title:"Morning routine",type:"routine"},
+    {id:"tue-work",start:"08:00",end:"13:00",title:"Work block",type:"job"},
+    {id:"tue-run",start:"13:15",end:"14:30",title:"Run",type:"gym"},
+    {id:"tue-uw",start:"15:00",end:"16:30",title:"UW learning",type:"uw"},
+    {id:"tue-jg",start:"16:30",end:"17:00",title:"JG admin",type:"jg"},
+    {id:"tue-wind",start:"21:00",end:"",title:"Phone off & wind down",type:"winddown"}
+  ],
+  Wednesday:[
+    {id:"wed-routine",start:"06:00",end:"07:00",title:"Morning routine",type:"routine"},
+    {id:"wed-work",start:"08:00",end:"13:00",title:"Work block",type:"job"},
+    {id:"wed-gym",start:"13:15",end:"14:30",title:"Full Body B + Bike",type:"gym"},
+    {id:"wed-app",start:"15:00",end:"16:30",title:"TransformHER",type:"appdev"},
+    {id:"wed-jg",start:"16:30",end:"17:00",title:"JG admin",type:"jg"},
+    {id:"wed-wind",start:"21:00",end:"",title:"Phone off & wind down",type:"winddown"}
+  ],
+  Thursday:[
+    {id:"thu-routine",start:"06:00",end:"07:00",title:"Morning routine",type:"routine"},
+    {id:"thu-work",start:"08:00",end:"13:00",title:"Work block",type:"job"},
+    {id:"thu-pilates",start:"13:15",end:"14:30",title:"Pilates & mobility",type:"gym"},
+    {id:"thu-content",start:"15:00",end:"16:30",title:"Travel content",type:"travel"},
+    {id:"thu-jg",start:"16:30",end:"17:00",title:"JG admin",type:"jg"},
+    {id:"thu-wind",start:"21:00",end:"",title:"Phone off & wind down",type:"winddown"}
+  ],
+  Friday:[
+    {id:"fri-routine",start:"06:00",end:"07:00",title:"Morning routine",type:"routine"},
+    {id:"fri-work",start:"08:00",end:"13:00",title:"Work block",type:"job"},
+    {id:"fri-run",start:"13:15",end:"14:30",title:"Run",type:"gym"},
+    {id:"fri-ceo",start:"15:00",end:"16:30",title:"Review & planning",type:"ceo"},
+    {id:"fri-jg",start:"16:30",end:"17:00",title:"JG admin",type:"jg"},
+    {id:"fri-wind",start:"21:00",end:"",title:"Phone off & wind down",type:"winddown"}
+  ],
+  Saturday:[
+    {id:"sat-routine",start:"06:00",end:"07:00",title:"Morning routine",type:"routine"},
+    {id:"sat-home",start:"",end:"",title:"Home workout",type:"gym"},
+    {id:"sat-wind",start:"21:00",end:"",title:"Phone off & wind down",type:"winddown"}
+  ],
+  Sunday:[
+    {id:"sun-routine",start:"06:00",end:"07:00",title:"Morning routine",type:"routine"},
+    {id:"sun-rest",start:"",end:"",title:"Rest or gentle walk",type:"routine"},
+    {id:"sun-wind",start:"21:00",end:"",title:"Phone off & wind down",type:"winddown"}
+  ]
+};
+function weeklyCalendarStore(){
+  try{
+    const saved=JSON.parse(localStorage.getItem("ceohq-weekly-calendar")||"null");
+    const store=saved||JSON.parse(JSON.stringify(defaultWeeklyCalendar));
+    // Keep all seven days available, including weekends, for older saved calendars.
+    calendarDays.forEach(day=>{
+      if(!Array.isArray(store[day])) store[day]=JSON.parse(JSON.stringify(defaultWeeklyCalendar[day]||[]));
+    });
+    return store;
+  }catch(e){return JSON.parse(JSON.stringify(defaultWeeklyCalendar));}
+}
+function saveWeeklyCalendar(store){localStorage.setItem("ceohq-weekly-calendar",JSON.stringify(store));}
+function calendarEventId(){return "cal-"+Date.now()+"-"+Math.random().toString(36).slice(2,7);}
+function formatCalendarTime(start,end){
+  if(!start&&!end)return "Flexible time";
+  if(start&&end)return `${start}–${end}`;
+  return start||end;
+}
+function renderWeeklyCalendar(){
+  const wrap=document.getElementById("weeklyCalendar"); if(!wrap)return;
+  const store=weeklyCalendarStore();
+  wrap.innerHTML=calendarDays.map(day=>{
+    const events=(store[day]||[]).slice().sort((a,b)=>(a.start||"99:99").localeCompare(b.start||"99:99"));
+    return `<div class="day ${day==="Saturday"||day==="Sunday"?"calendar-weekend":""}" data-calendar-day="${day}">
+      <div class="calendar-day-header"><h3>${day}</h3><button class="calendar-add" data-add-calendar="${day}" aria-label="Add event to ${day}">+ Add event</button></div>
+      <div class="calendar-events">${events.length?events.map(e=>`<div class="calendar-event ${safeText(e.type||"ceo")}" data-edit-calendar="${day}|${e.id}">
+        <button class="calendar-delete" data-delete-calendar="${day}|${e.id}" aria-label="Delete ${safeText(e.title)}">×</button>
+        <span class="calendar-event-time">${safeText(formatCalendarTime(e.start,e.end))}</span>
+        <span class="calendar-event-title">${safeText(e.title)}</span>
+        ${e.notes?`<span class="calendar-event-notes">${safeText(e.notes)}</span>`:""}
+      </div>`).join(""):`<div class="calendar-empty">Nothing added yet.</div>`}</div>
+      <div class="calendar-form" data-calendar-form="${day}">
+        <div class="calendar-time-row"><input type="time" data-cal-start><input type="time" data-cal-end></div>
+        <input type="text" data-cal-title placeholder="What are you doing? e.g. Coffee with Dawnie ☕">
+        <textarea data-cal-notes placeholder="Notes (optional)"></textarea>
+        <input type="hidden" data-cal-id>
+        <div class="calendar-form-actions"><button class="btn" data-save-calendar="${day}">Save</button><button class="btn secondary" data-cancel-calendar="${day}">Cancel</button></div>
+      </div>
+    </div>`;
+  }).join("");
+
+  wrap.querySelectorAll("[data-add-calendar]").forEach(btn=>btn.addEventListener("click",()=>openCalendarForm(btn.dataset.addCalendar)));
+  wrap.querySelectorAll("[data-edit-calendar]").forEach(item=>item.addEventListener("click",e=>{
+    if(e.target.closest("[data-delete-calendar]"))return;
+    const [day,id]=item.dataset.editCalendar.split("|");openCalendarForm(day,id);
+  }));
+  wrap.querySelectorAll("[data-delete-calendar]").forEach(btn=>btn.addEventListener("click",e=>{
+    e.stopPropagation();const [day,id]=btn.dataset.deleteCalendar.split("|");
+    const data=weeklyCalendarStore();data[day]=(data[day]||[]).filter(x=>x.id!==id);saveWeeklyCalendar(data);renderWeeklyCalendar();toast("Calendar item removed");
+  }));
+  wrap.querySelectorAll("[data-save-calendar]").forEach(btn=>btn.addEventListener("click",()=>saveCalendarForm(btn.dataset.saveCalendar)));
+  wrap.querySelectorAll("[data-cancel-calendar]").forEach(btn=>btn.addEventListener("click",()=>closeCalendarForms()));
+}
+function closeCalendarForms(){document.querySelectorAll(".calendar-form.open").forEach(f=>f.classList.remove("open"));}
+function openCalendarForm(day,id=""){
+  closeCalendarForms();const form=document.querySelector(`[data-calendar-form="${day}"]`);if(!form)return;
+  const data=weeklyCalendarStore();const event=id?(data[day]||[]).find(x=>x.id===id):null;
+  form.querySelector("[data-cal-start]").value=event?.start||"";
+  form.querySelector("[data-cal-end]").value=event?.end||"";
+  form.querySelector("[data-cal-title]").value=event?.title||"";
+  form.querySelector("[data-cal-notes]").value=event?.notes||"";
+  form.querySelector("[data-cal-id]").value=event?.id||"";
+  form.classList.add("open");form.querySelector("[data-cal-title]").focus();
+}
+function saveCalendarForm(day){
+  const form=document.querySelector(`[data-calendar-form="${day}"]`);if(!form)return;
+  const title=form.querySelector("[data-cal-title]").value.trim();
+  if(!title){toast("Add a title first");return;}
+  const id=form.querySelector("[data-cal-id]").value||calendarEventId();
+  const existing=(weeklyCalendarStore()[day]||[]).find(x=>x.id===id);
+  const event={id,start:form.querySelector("[data-cal-start]").value,end:form.querySelector("[data-cal-end]").value,title,notes:form.querySelector("[data-cal-notes]").value.trim(),type:existing?.type||"ceo"};
+  const data=weeklyCalendarStore();const list=data[day]||[];const index=list.findIndex(x=>x.id===id);
+  if(index>=0)list[index]=event;else list.push(event);data[day]=list;saveWeeklyCalendar(data);renderWeeklyCalendar();toast("Calendar updated ✨");
+}
+const resetWeeklyCalendar=document.getElementById("resetWeeklyCalendar");
+if(resetWeeklyCalendar)resetWeeklyCalendar.addEventListener("click",()=>{
+  if(confirm("Reset your weekly calendar back to the original routine?")){localStorage.removeItem("ceohq-weekly-calendar");renderWeeklyCalendar();toast("Calendar reset ✨");}
+});
+renderWeeklyCalendar();
+
 
 const travelEvents=[{"uid": "evt_h6qy6wfnwvlu", "title": "Amy Beckett & Claire Hill Collaboration Rep Training", "start": "2026-07-29T21:00:00", "location": "https://us06web.zoom.us/j/85199708566?pwd=lacyAQSwIfMU9tbFpkNTMc5WTYZpJx.1"}, {"uid": "evt_600nmj015l5j", "title": "Travel Information Call", "start": "2026-07-30T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_0nc6usn1n410", "title": "TU Coworking session", "start": "2026-08-03T21:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_mpxu762aq2pe", "title": "Donald Bradley (PlanNet Marketing Founder & CEO) joining TU Community Call", "start": "2026-08-05T20:30:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_0vswgfqvhiav", "title": "Travel Information Call", "start": "2026-08-06T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_6caqhqnejnnw", "title": "Debbie Neal - guest training for TU Community", "start": "2026-08-10T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_9cmospaidutf", "title": "Monthly Mindset Call with Josephine", "start": "2026-08-12T20:30:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_oybq6jw3e0hy", "title": "Travel Information Call", "start": "2026-08-13T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_5dz9rmpn86z7", "title": "Travel Information Call", "start": "2026-08-20T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_8b2957ngzq2r", "title": "Travel Information Call", "start": "2026-08-27T20:00:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_lnrzds75nfrh", "title": "Monthly Mindset Call with Josephine", "start": "2026-09-14T20:30:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}, {"uid": "evt_1w8vpwdf6rrg", "title": "Monthly Mindset Call with Josephine", "start": "2026-10-12T20:30:00", "location": "https://us06web.zoom.us/j/4242408888?pwd=K3Q2b1V2a09HaHA3bFY3YUtCMWlzZz09"}];
 function callKey(uid,field){return "ceohq-call-"+uid+"-"+field}
