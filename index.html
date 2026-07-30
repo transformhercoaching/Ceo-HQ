@@ -4,12 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#8B7667" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="TransformHER CEO" />
 <link rel="icon" href="icon-192.svg" type="image/svg+xml" />
   <link rel="manifest" href="manifest.webmanifest" />
   <title>TransformHER CEO</title>
+  <!-- Build: v9-free-text-planner -->
   <style>
     :root{
       --ivory:#FAF7F3;
@@ -83,6 +87,11 @@
     input[type=checkbox]{width:20px;height:20px;accent-color:var(--rose)}
     .task label{line-height:1.35;flex:1}
     .task.done label{text-decoration:line-through;color:#9C928B}
+    .checklist-add{display:flex;gap:8px;margin-top:12px}
+    .checklist-add input{flex:1}
+    .task-delete{border:0;background:transparent;color:#9C928B;font-size:1.1rem;cursor:pointer;padding:0 4px;line-height:1}
+    .task-delete:hover{color:var(--taupe-dark)}
+    .checklist-empty{padding:10px 0;color:var(--muted);font-size:.92rem}
     .schedule{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
     .day{background:#FBF8F5;border:1px solid var(--line);border-radius:18px;padding:14px;min-height:230px}
     .day h3{font-size:1.05rem;margin-bottom:10px}
@@ -306,6 +315,10 @@
 <div class="card wide">
           <h3>Today’s checklist</h3>
           <div id="dailyTasks"></div>
+          <div class="checklist-add">
+            <input type="text" id="newDailyTask" placeholder="Add something for today…" aria-label="New checklist item">
+            <button class="btn" id="addDailyTask" type="button">+ Add</button>
+          </div>
         </div>
         
         <div class="card" id="prioritiesCard">
@@ -565,16 +578,6 @@
   renderWelcome();
   document.getElementById("dayFocus").textContent = themes[day][0];
 
-  const weekdayTasks = {
-    Monday:["Part-time job 8am–1pm","Gym + lunch","Travel business focus block","30 mins JG admin","Finish work by 5pm"],
-    Tuesday:["Part-time job 8am–1pm","Training / run + lunch","UW learning block","30 mins JG admin","Finish work by 5pm"],
-    Wednesday:["Part-time job 8am–1pm","Gym + lunch","TransformHER CEO development block","30 mins JG admin","Finish work by 5pm"],
-    Thursday:["Part-time job 8am–1pm","Pilates / training + lunch","Travel content block","30 mins JG admin","Finish work by 5pm"],
-    Friday:["Part-time job 8am–1pm","Training / run + lunch","CEO review and planning","30 mins JG admin","Close the week calmly"],
-    Saturday:["No business work","Enjoy the day","Do something that fills your cup"],
-    Sunday:["No business work","Rest and reset","Prepare gently for Monday"]
-  };
-
   function currentDateKey(){
     const d=new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
@@ -582,15 +585,81 @@
   function dailyKey(name){ return `ceohq-${currentDateKey()}-${name}`; }
 
   const tasksEl = document.getElementById("dailyTasks");
-  weekdayTasks[day].forEach((text,i)=>{
-    const wrap=document.createElement("div"); wrap.className="task";
-    const cb=document.createElement("input"); cb.type="checkbox"; cb.dataset.daily=i;
-    cb.checked=localStorage.getItem(dailyKey("task"+i))==="1";
-    const label=document.createElement("label"); label.textContent=text;
-    if(cb.checked) wrap.classList.add("done");
-    cb.addEventListener("change",()=>{localStorage.setItem(dailyKey("task"+i),cb.checked?"1":"0");wrap.classList.toggle("done",cb.checked);updateProgress();});
-    wrap.append(cb,label); tasksEl.appendChild(wrap);
-  });
+  const newDailyTaskInput = document.getElementById("newDailyTask");
+  const addDailyTaskButton = document.getElementById("addDailyTask");
+
+  function getDailyChecklist(){
+    try { return JSON.parse(localStorage.getItem(dailyKey("custom-checklist"))) || []; }
+    catch { return []; }
+  }
+
+  function saveDailyChecklist(items){
+    localStorage.setItem(dailyKey("custom-checklist"), JSON.stringify(items));
+  }
+
+  function renderDailyChecklist(){
+    const items=getDailyChecklist();
+    tasksEl.innerHTML="";
+
+    if(!items.length){
+      const empty=document.createElement("div");
+      empty.className="checklist-empty";
+      empty.textContent="Nothing added yet — create your own checklist for today.";
+      tasksEl.appendChild(empty);
+    }
+
+    items.forEach(item=>{
+      const wrap=document.createElement("div");
+      wrap.className="task"+(item.done?" done":"");
+
+      const cb=document.createElement("input");
+      cb.type="checkbox";
+      cb.dataset.daily=item.id;
+      cb.checked=!!item.done;
+      cb.setAttribute("aria-label",`Complete ${item.text}`);
+
+      const label=document.createElement("label");
+      label.textContent=item.text;
+
+      const del=document.createElement("button");
+      del.type="button";
+      del.className="task-delete";
+      del.textContent="×";
+      del.setAttribute("aria-label",`Delete ${item.text}`);
+
+      cb.addEventListener("change",()=>{
+        const updated=getDailyChecklist().map(x=>x.id===item.id?{...x,done:cb.checked}:x);
+        saveDailyChecklist(updated);
+        wrap.classList.toggle("done",cb.checked);
+        updateProgress();
+      });
+
+      del.addEventListener("click",()=>{
+        saveDailyChecklist(getDailyChecklist().filter(x=>x.id!==item.id));
+        renderDailyChecklist();
+        updateProgress();
+      });
+
+      wrap.append(cb,label,del);
+      tasksEl.appendChild(wrap);
+    });
+  }
+
+  function addDailyTask(){
+    const text=newDailyTaskInput.value.trim();
+    if(!text)return;
+    const items=getDailyChecklist();
+    items.push({id:`task-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,text,done:false});
+    saveDailyChecklist(items);
+    newDailyTaskInput.value="";
+    renderDailyChecklist();
+    updateProgress();
+    newDailyTaskInput.focus();
+  }
+
+  addDailyTaskButton.addEventListener("click",addDailyTask);
+  newDailyTaskInput.addEventListener("keydown",e=>{if(e.key==="Enter")addDailyTask();});
+  renderDailyChecklist();
 
   document.querySelectorAll("nav button").forEach(btn=>{
     btn.addEventListener("click",()=>{
@@ -688,7 +757,7 @@
   function updateProgress(){
     const boxes=[...document.querySelectorAll("[data-daily], [data-priority-check]")];
     const done=boxes.filter(b=>b.checked).length;
-    const pct=Math.round(done/boxes.length*100);
+    const pct=boxes.length ? Math.round(done/boxes.length*100) : 0;
     document.getElementById("progressRing").style.setProperty("--progress",pct+"%");
     document.getElementById("progressText").textContent=pct+"%";
     document.getElementById("progressCaption").textContent=pct===100?"CEO mode: complete. You’ve done enough for today. ✨":pct>=60?"You’re making lovely progress.":pct>0?"Keep it gentle and focused.":"Start with one small win.";
@@ -702,11 +771,8 @@
   function resetDaily(){
     if(!confirm("Reset today’s priorities, checklist, water, mood, reading and daily win? Your workout history, previous weights and weekly plan will stay saved."))return;
 
-    document.querySelectorAll("[data-daily]").forEach((cb,i)=>{
-      cb.checked=false;
-      localStorage.removeItem(dailyKey("task"+i));
-      cb.closest(".task")?.classList.remove("done");
-    });
+    localStorage.removeItem(dailyKey("custom-checklist"));
+    renderDailyChecklist();
 
     document.querySelectorAll("[data-priority-check]").forEach(cb=>{
       cb.checked=false;
@@ -1222,7 +1288,7 @@ renderTrainingWeek(); renderTodayWorkout(); renderStairs(); showWorkout(new Date
   if ("serviceWorker" in navigator) {
     window.addEventListener("load",async()=>{
       try{
-        const reg=await navigator.serviceWorker.register("./service-worker.js?v=8");
+        const reg=await navigator.serviceWorker.register("./service-worker.js?v=10");
         await reg.update();
       }catch(e){console.warn("Service worker update failed",e);}
     });
